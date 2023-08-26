@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gymnasium_mars_lander"
+version = "0.0.1"
+authors = [
+    { name = "Quentin Deschamps", email = "quentindeschamps18@gmail.com" },
+]
+description = "A reinforcement learning environment for the Mars Lander CG puzzle"
+readme = "README.md"
+requires-python = ">=3.8"
+keywords = ["Reinforcement Learning", "game", "RL", "AI", "gymnasium", "pygame"]
+license = { text = "MIT" }
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Games/Entertainment",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "gymnasium==0.29.0",
+    "pygame==2.5.0",
+]
+
+[project.optional-dependencies]
+testing = ["pytest==7.4.0"]
+
+[project.urls]
+Repository = "https://github.com/Quentin18/gymnasium-2048"
+
+[tool.black]
+line-length = 88
+
+[tool.isort]
+profile = "black"
+
+[tool.pep8]
+max-line-length = "88"
+
+[tool.pylint."MESSAGES CONTROL"]
+max-line-length = 88
+disable = [
+    "missing-module-docstring",
+]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra"
