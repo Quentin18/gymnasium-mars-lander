@@ -135,7 +135,7 @@ class MarsLanderEnv(gym.Env):
         ground[0, 0] = 0
         ground[-1, 0] = self.scene_width - 1
         rover.x = np.clip(rover.x, 0, self.scene_width)
-        rover.y = np.clip(rover.x, 0, self.scene_height)
+        rover.y = np.clip(rover.y, 0, self.scene_height)
         rover.fuel = np.clip(rover.fuel, 0, self.fuel_max)
 
         return ground, rover
