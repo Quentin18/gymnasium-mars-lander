@@ -16,3 +16,8 @@ gymnasium_mars_lander/MarsLander-v0:
     activation_fn=nn.ReLU,
     net_arch=dict(pi=[128, 128], vf=[128, 128])
   )"
+  callback:
+    - wandb.integration.sb3.WandbCallback:
+        gradient_save_freq: 10000
+        model_save_freq: 100000
+        model_save_path: "models/PPO"
