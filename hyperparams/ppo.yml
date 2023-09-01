@@ -1,7 +1,7 @@
 gymnasium_mars_lander/MarsLander-v0:
   n_envs: 1
+  n_timesteps: !!float 2e6
   policy: 'MultiInputPolicy'
-  n_timesteps: !!float 1e6
   n_steps: 8192
   gamma: 0.995
   learning_rate: 0.000005
@@ -20,4 +20,4 @@ gymnasium_mars_lander/MarsLander-v0:
     - wandb.integration.sb3.WandbCallback:
         gradient_save_freq: 10000
         model_save_freq: 100000
-        model_save_path: "models/PPO"
+        model_save_path: 'models'

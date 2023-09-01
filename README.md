@@ -7,6 +7,7 @@ Gymnasium environment for the Mars Lander CG puzzle
 ```bash
 python -m rl_zoo3.train \
   --algo ppo \
+  --tensorboard-log runs \
   --env gymnasium_mars_lander/MarsLander-v0 \
   --log-interval 100 \
   --eval-freq 10000 \
