@@ -2,12 +2,11 @@
 
 Gymnasium environment for the Mars Lander CG puzzle
 
-## Train
+## Train an agent
 
 ```bash
 python -m rl_zoo3.train \
   --algo ppo \
-  --tensorboard-log runs \
   --env gymnasium_mars_lander/MarsLander-v0 \
   --log-interval 100 \
   --eval-freq 10000 \
@@ -18,6 +17,19 @@ python -m rl_zoo3.train \
   --progress \
   --track \
   --wandb-project-name mars-lander
+```
+
+## Enjoy a trained agent
+
+```bash
+python -m rl_zoo3.enjoy \
+  --algo ppo \
+  --env gymnasium_mars_lander/MarsLander-v0 \
+  --n-timesteps 5000 \
+  --deterministic \
+  --seed 42 \
+  --gym-packages gymnasium_mars_lander \
+  --progress
 ```
 
 ## References
