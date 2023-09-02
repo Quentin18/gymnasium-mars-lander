@@ -18,6 +18,7 @@ gymnasium_mars_lander/MarsLander-v0:
   )"
   callback:
     - wandb.integration.sb3.WandbCallback:
+        verbose: 2
         gradient_save_freq: 10000
         model_save_freq: 100000
         model_save_path: 'models'
