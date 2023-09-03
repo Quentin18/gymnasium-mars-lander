@@ -323,7 +323,7 @@ class MarsLanderEnv(gym.Env):
         canvas.blit(
             source=pygame.transform.rotate(
                 surface=self.rover_img,
-                angle=self.rover.rotate,
+                angle=-self.rover.rotate,
             ),
             dest=(
                 self.rover.x // SCALE_FACTOR - self.rover_img.get_width() // 2,
