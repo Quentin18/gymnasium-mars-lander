@@ -212,7 +212,7 @@ class MarsLanderEnv(gym.Env):
         self,
         action: ActType,
     ) -> tuple[ObsType, SupportsFloat, bool, bool, dict[str, Any]]:
-        action = np.clip(action, -1, 1)
+        action = np.clip(action, -1, 1).astype(np.float32)
         assert self.action_space.contains(
             action
         ), f"{action!r} ({type(action)}) invalid"
