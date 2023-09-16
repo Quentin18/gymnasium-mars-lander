@@ -55,17 +55,17 @@ class MarsLanderEnv(gym.Env):
 
         self.observation_space = spaces.Dict(
             {
-                "ground": spaces.Box(low=0, high=1, shape=(30, 2), dtype=np.float32),
-                "landing": spaces.Box(low=0, high=1, shape=(2, 2), dtype=np.float32),
+                "ground": spaces.Box(low=0, high=1, shape=(30, 2), dtype=np.float64),
+                "landing": spaces.Box(low=0, high=1, shape=(2, 2), dtype=np.float64),
                 "rover": spaces.Box(
                     low=np.array([0, 0, -1, -1, 0, -1, 0]),
                     high=np.array([1, 1, 1, 1, 1, 1, 1]),
-                    dtype=np.float32,
+                    dtype=np.float64,
                 ),
             }
         )
 
-        self.action_space = spaces.Box(low=-1, high=1, shape=(2,), dtype=np.float32)
+        self.action_space = spaces.Box(low=-1, high=1, shape=(2,), dtype=np.float64)
 
         assert render_mode is None or render_mode in self.metadata["render_modes"]
         self.render_mode = render_mode
@@ -78,11 +78,11 @@ class MarsLanderEnv(gym.Env):
     def _get_obs(self) -> ObsType:
         observation = {
             "ground": (self.ground / [self.scene_width, self.scene_height]).astype(
-                np.float32
+                np.float64
             ),
             "landing": (
                 self.ground[self.landing_area] / [self.scene_width, self.scene_height]
-            ).astype(np.float32),
+            ).astype(np.float64),
             "rover": (
                 np.rint(self.rover.numpy())
                 / [
@@ -94,7 +94,7 @@ class MarsLanderEnv(gym.Env):
                     self.rotate_max,
                     self.power_max,
                 ]
-            ).astype(np.float32),
+            ).astype(np.float64),
         }
         return observation
 
@@ -102,7 +102,7 @@ class MarsLanderEnv(gym.Env):
         test_index = self.np_random.choice(np.arange(len(MARS_LANDER_TEST_CASES)))
         ground = np.array(
             MARS_LANDER_TEST_CASES[test_index]["ground"],
-            dtype=np.float32,
+            dtype=np.float64,
         )
         rover = RoverState(MARS_LANDER_TEST_CASES[test_index]["rover"])
 
@@ -152,7 +152,7 @@ class MarsLanderEnv(gym.Env):
         evaluate = bool(None if options is None else options.get("eval"))
 
         if options is not None and "ground" in options and "rover" in options:
-            self.ground = np.array(options["ground"], dtype=np.float32)
+            self.ground = np.array(options["ground"], dtype=np.float64)
             self.rover = RoverState(options["rover"])
         else:
             self.ground, self.rover = self._generate_random_input(evaluate=evaluate)
@@ -212,7 +212,6 @@ class MarsLanderEnv(gym.Env):
         self,
         action: ActType,
     ) -> tuple[ObsType, SupportsFloat, bool, bool, dict[str, Any]]:
-        action = np.clip(action, -1, 1).astype(np.float32)
         assert self.action_space.contains(
             action
         ), f"{action!r} ({type(action)}) invalid"
