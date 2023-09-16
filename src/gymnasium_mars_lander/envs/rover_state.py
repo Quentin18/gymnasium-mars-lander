@@ -23,7 +23,7 @@ class RoverState:
         Args:
             state: Array of 7 physical measurements represented as floats.
         """
-        self._state = np.array(state, dtype=np.float32)
+        self._state = np.array(state, dtype=np.float64)
         assert self._state.shape == (7,), "invalid rover state shape"
 
     @property
