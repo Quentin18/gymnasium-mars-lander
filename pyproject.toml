@@ -46,7 +46,12 @@ max-line-length = "88"
 [tool.pylint."MESSAGES CONTROL"]
 max-line-length = 88
 disable = [
+    "attribute-defined-outside-init",
+    "inconsistent-return-statements",
+    "invalid-name",
+    "missing-function-docstring",
     "missing-module-docstring",
+    "too-many-instance-attributes",
 ]
 
 [tool.pytest.ini_options]

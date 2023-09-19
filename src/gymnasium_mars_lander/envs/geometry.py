@@ -16,7 +16,8 @@ def l2dist(x: np.ndarray, y: np.ndarray) -> float:
 
 
 def convert_to_fixed_length_polygon(polygon: np.ndarray, n: int = 30) -> np.ndarray:
-    """Represent a polygon with a certain number of nodes by breaking down the longest segments.
+    """Represent a polygon with a certain number of nodes
+    by breaking down the longest segments.
 
     Args:
         polygon: Array of 2D coordinates (x, y).
@@ -38,11 +39,12 @@ def convert_to_fixed_length_polygon(polygon: np.ndarray, n: int = 30) -> np.ndar
     return polygon
 
 
-def find_flat_segment(polygon: np.ndarray) -> list[int, int]:
+def find_flat_segment(polygon: np.ndarray) -> list[int]:
     """Find start and end indexes of a horizontal section in the polygon.
 
     This section can be made of several consecutive segments.
-    If the polygon contains several flat sections, this function only identifies the first one.
+    If the polygon contains several flat sections,
+    this function only identifies the first one.
 
     Args:
         polygon: Array of 2D coordinates (x, y).
@@ -101,7 +103,8 @@ def segment_intersect(
 def is_inside_ground(ground: np.ndarray, x: float, y: float, y_max: float) -> bool:
     """Check if a point is inside the ground.
 
-    Inspired by https://www.geeksforgeeks.org/how-to-check-if-a-given-point-lies-inside-a-polygon/.
+    Inspired by
+    https://www.geeksforgeeks.org/how-to-check-if-a-given-point-lies-inside-a-polygon/
 
     Args:
         ground: List of points representing the ground.

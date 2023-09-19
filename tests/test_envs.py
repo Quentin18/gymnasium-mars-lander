@@ -1,3 +1,4 @@
+# pylint: disable=protected-access,redefined-outer-name
 import gymnasium as gym
 import numpy as np
 import pytest
@@ -52,12 +53,12 @@ def test_update_state(env: MarsLanderEnv):
     env.rover = RoverState(state=(6500, 2800, -100, 0, 600, 90, 0))
 
     # When
-    for i in range(3):
+    for _ in range(3):
         env._update_state(rotate=-15, power=1)
-    for i in range(4):
+    for _ in range(4):
         env._update_state(rotate=-15, power=0)
     env._update_state(rotate=-5, power=0)
-    for i in range(60):
+    for _ in range(60):
         env._update_state(rotate=0, power=0)
     state = np.rint(env.rover.numpy())
 
@@ -90,7 +91,7 @@ def test_collision(env: MarsLanderEnv):
 
     # When
     for i in range(70):
-        observation, reward, terminated, truncated, info = env.step([-1, 1])
+        _, reward, terminated, truncated, _ = env.step([-1, 1])
         if terminated or truncated:
             break
 
@@ -124,9 +125,9 @@ def test_rover_exits_field_of_view(env: MarsLanderEnv):
 
     # When
     for i in range(6):
-        observation, reward, terminated, truncated, info = env.step([-1, 1])
+        _, reward, terminated, truncated, _ = env.step([-1, 1])
     for i in range(64):
-        observation, reward, terminated, truncated, info = env.step([0, 0])
+        _, reward, terminated, truncated, _ = env.step([0, 0])
         if terminated or truncated:
             break
 
@@ -161,10 +162,10 @@ def test_successful_landing(env: MarsLanderEnv):
     env.step([0, 1])
     env.step([0, 1])
     for i in range(70):
-        observation, reward, terminated, truncated, info = env.step([0, -1])
+        _, reward, terminated, truncated, _ = env.step([0, -1])
         if terminated or truncated:
             break
-        observation, reward, terminated, truncated, info = env.step([0, 1])
+        _, reward, terminated, truncated, _ = env.step([0, 1])
 
     # Then
     assert i == 64

@@ -282,7 +282,7 @@ class MarsLanderEnv(gym.Env):
 
     def _render_frame(self) -> RenderFrame | list[RenderFrame]:
         if self.window is None and self.render_mode == "human":
-            pygame.init()
+            pygame.init()  # pylint: disable=no-member
             pygame.display.init()
             self.window = pygame.display.set_mode(
                 (self.scene_width // SCALE_FACTOR, self.scene_height // SCALE_FACTOR)
@@ -356,4 +356,4 @@ class MarsLanderEnv(gym.Env):
     def close(self) -> None:
         if self.window is not None:
             pygame.display.quit()
-            pygame.quit()
+            pygame.quit()  # pylint: disable=no-member
