@@ -40,7 +40,15 @@ class MarsLanderEnv(gym.Env):
 
     metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 10}
 
-    def __init__(self, render_mode: str | None = None) -> None:
+    def __init__(
+        self,
+        render_mode: str | None = None,
+        episode: int = 2,
+        eval_env: bool = False,
+    ) -> None:
+        self.episode = episode
+        self.eval_env = eval_env
+
         self.gravity = 3.711  # meters/sec^2
         self.scene_width = 7000  # meters
         self.scene_height = 3000  # meters
@@ -98,16 +106,14 @@ class MarsLanderEnv(gym.Env):
         }
         return observation
 
-    def _generate_random_input(self, evaluate: bool) -> tuple[np.ndarray, RoverState]:
-        test_index = self.np_random.choice(np.arange(len(MARS_LANDER_TEST_CASES)))
-        ground = np.array(
-            MARS_LANDER_TEST_CASES[test_index]["ground"],
-            dtype=np.float64,
-        )
-        rover = RoverState(MARS_LANDER_TEST_CASES[test_index]["rover"])
+    def _generate_random_input(self) -> tuple[np.ndarray, RoverState]:
+        test_cases = MARS_LANDER_TEST_CASES[self.episode - 1]
+        test_index = self.np_random.choice(np.arange(len(test_cases)))
+        ground = np.array(test_cases[test_index]["ground"], dtype=np.float64)
+        rover = RoverState(test_cases[test_index]["rover"])
 
         # flip left-right
-        if not evaluate and self.np_random.random() < 0.5:
+        if not self.eval_env and self.np_random.random() < 0.5:
             ground[:, 0] = self.scene_width - ground[:, 0]
             ground = ground[::-1]
             rover.x = self.scene_width - rover.x
@@ -115,19 +121,16 @@ class MarsLanderEnv(gym.Env):
             rover.rotate *= -1
 
         # add fuel randomly
-        if not evaluate:
-            rover.fuel += self.np_random.random() * 150
+        if not self.eval_env:
+            rover.fuel += self.np_random.uniform(0, 50)
 
         # shift rover randomly
-        rover.y += self.np_random.random() * 2 * 50 - 50
-        rover.x += self.np_random.random() * 2 * 30 - 30
+        rover.y += self.np_random.uniform(-50, 50)
+        rover.x += self.np_random.uniform(-50, 50)
 
         # shift ground randomly
-        ground[:, 0] += self.np_random.random() * 2 * 50 - 50
-        if test_index != 4:
-            ground[:, 1] -= self.np_random.random() * 50
-        else:
-            ground[:, 1] += self.np_random.random() * 2 * 50 - 50
+        ground[:, 0] += self.np_random.uniform(-50, 50)
+        ground[:, 1] += self.np_random.uniform(-50, 50)
 
         # clip values
         ground[:, 0] = np.clip(ground[:, 0], 0, self.scene_width)
@@ -148,14 +151,11 @@ class MarsLanderEnv(gym.Env):
     ) -> tuple[ObsType, dict[str, Any]]:
         super().reset(seed=seed)
 
-        # eval mode to use CG test cases
-        evaluate = bool(None if options is None else options.get("eval"))
-
         if options is not None and "ground" in options and "rover" in options:
             self.ground = np.array(options["ground"], dtype=np.float64)
             self.rover = RoverState(options["rover"])
         else:
-            self.ground, self.rover = self._generate_random_input(evaluate=evaluate)
+            self.ground, self.rover = self._generate_random_input()
 
         self.ground = geometry.convert_to_fixed_length_polygon(
             polygon=self.ground,
@@ -268,7 +268,7 @@ class MarsLanderEnv(gym.Env):
                 )
             else:
                 info["msg"] = "Mission accomplished"
-                reward = self.rover.fuel - self.rover.power**2
+                reward = self.rover.fuel
             terminated = True
 
         if self.render_mode == "human":

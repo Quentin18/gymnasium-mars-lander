@@ -15,6 +15,13 @@ def parse_args() -> argparse.Namespace:
         required=True,
         help="path to model file",
     )
+    parser.add_argument(
+        "-e",
+        "--episode",
+        default=2,
+        type=int,
+        help="episode",
+    )
     args = parser.parse_args()
     return args
 
@@ -28,7 +35,7 @@ def main() -> None:
     model = PPO.load(path=args.path, env=env)
 
     total_reward = 0
-    for i, test_case in enumerate(MARS_LANDER_TEST_CASES):
+    for test_case in MARS_LANDER_TEST_CASES[args.episode - 1]:
         observation, info = env.reset(options=test_case)
 
         while True:
@@ -38,11 +45,11 @@ def main() -> None:
             if terminated or truncated:
                 break
 
-        total_reward += int(reward)
-        print(f"Test case {i}: {reward} ({info['msg']})")
+        total_reward += reward
+        print(f"{test_case['name']: <30} {info['msg']: <25} {int(reward)}")
 
     env.close()
-    print("Total reward:", total_reward)
+    print("Total reward:", int(total_reward))
 
 
 if __name__ == "__main__":

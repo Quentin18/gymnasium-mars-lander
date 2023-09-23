@@ -23,6 +23,13 @@ def parse_args() -> argparse.Namespace:
         help="test case index",
     )
     parser.add_argument(
+        "-e",
+        "--episode",
+        default=2,
+        type=int,
+        help="episode",
+    )
+    parser.add_argument(
         "--n-samples",
         type=int,
         default=1,
@@ -49,13 +56,12 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+    test_case = MARS_LANDER_TEST_CASES[args.episode - 1][args.index]
+    print("Test case:", test_case["name"])
 
     for _ in range(args.n_samples):
-        ground = np.array(
-            MARS_LANDER_TEST_CASES[args.index]["ground"],
-            dtype=np.float64,
-        )
-        rover = RoverState(MARS_LANDER_TEST_CASES[args.index]["rover"])
+        ground = np.array(test_case["ground"], dtype=np.float64)
+        rover = RoverState(test_case["rover"])
 
         # flip left-right
         if args.flip:
@@ -67,16 +73,13 @@ def main() -> None:
 
         # shift rover randomly
         if args.shift_rover:
-            rover.y += np.random.random() * 2 * 50 - 50
-            rover.x += np.random.random() * 2 * 30 - 30
+            rover.y += np.random.uniform(-50, 50)
+            rover.x += np.random.uniform(-50, 50)
 
         # shift ground randomly
         if args.shift_ground:
-            ground[:, 0] += np.random.random() * 2 * 50 - 50
-            if args.index != 4:
-                ground[:, 1] -= np.random.random() * 50
-            else:
-                ground[:, 1] += np.random.random() * 2 * 50 - 50
+            ground[:, 0] += np.random.uniform(-50, 50)
+            ground[:, 1] += np.random.uniform(-50, 50)
 
         plt.plot(ground[:, 0], ground[:, 1], marker="x", color="r", linewidth=0.2)
         plt.plot(rover.x, rover.y, marker="o", markersize=10)
