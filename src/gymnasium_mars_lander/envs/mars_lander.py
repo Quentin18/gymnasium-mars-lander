@@ -245,7 +245,8 @@ class MarsLanderEnv(gym.Env):
             y_max=self.scene_height,
         ):
             on_flat_ground = (
-                self.ground[self.landing_area[0]][0]
+                self.rover.y <= self.ground[self.landing_area[0]][1]
+                and self.ground[self.landing_area[0]][0]
                 <= self.rover.x
                 <= self.ground[self.landing_area[1]][0]
             )
