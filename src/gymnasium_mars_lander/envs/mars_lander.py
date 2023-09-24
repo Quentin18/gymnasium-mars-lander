@@ -260,13 +260,12 @@ class MarsLanderEnv(gym.Env):
 
             if not mission_completed:
                 info["msg"] = "Rover has been destroyed"
-                reward = (
-                    -50
-                    if on_flat_ground
-                    else -75
-                    if has_no_angle and has_low_speed
-                    else -100
-                )
+                if on_flat_ground:
+                    reward = -50
+                elif has_no_angle and has_low_speed:
+                    reward = -75
+                else:
+                    reward = -100
             else:
                 info["msg"] = "Mission accomplished"
                 reward = self.rover.fuel
