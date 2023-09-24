@@ -29,7 +29,12 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-testing = ["pytest==7.4.0"]
+testing = ["pytest==7.4.2"]
+quality = [
+    "black==23.9.1",
+    "isort==5.12.0",
+    "pylint==2.17.5"
+]
 
 [project.urls]
 Repository = "https://github.com/Quentin18/gymnasium-2048"
@@ -47,6 +52,7 @@ max-line-length = "88"
 max-line-length = 88
 disable = [
     "attribute-defined-outside-init",
+    "duplicate-code",
     "inconsistent-return-statements",
     "invalid-name",
     "missing-function-docstring",
