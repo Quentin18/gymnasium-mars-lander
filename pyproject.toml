@@ -29,6 +29,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+extra = [
+    "matplotlib==3.8.0",
+    "rl-zoo3==2.1.0",
+]
 testing = ["pytest==7.4.2"]
 quality = [
     "black==23.9.1",
