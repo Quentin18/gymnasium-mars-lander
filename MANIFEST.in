@@ -1,0 +1,1 @@
+include src/gymnasium_mars_lander/envs/assets/*.png
