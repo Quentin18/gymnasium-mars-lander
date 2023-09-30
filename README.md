@@ -139,6 +139,14 @@ To see a trained agent in action on CodinGame test cases, execute:
 python -m scripts.enjoy --path rl-trained-agents/ppo/best_model.zip
 ```
 
+To record videos of a trained agent in action on CodinGame test cases, execute:
+
+```bash
+python -m scripts.enjoy \
+  --path rl-trained-agents/ppo/best_model.zip \
+  --record-video
+```
+
 ## Tests
 
 To run tests, execute:

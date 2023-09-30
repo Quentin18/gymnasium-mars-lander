@@ -1,6 +1,9 @@
 import argparse
+import glob
+import os.path
 
 import gymnasium as gym
+from moviepy.editor import VideoFileClip, concatenate_videoclips
 from stable_baselines3 import PPO
 
 from gymnasium_mars_lander.envs.level import MARS_LANDER_TEST_CASES
@@ -22,16 +25,45 @@ def parse_args() -> argparse.Namespace:
         type=int,
         help="episode",
     )
+    parser.add_argument(
+        "--record-video",
+        action="store_true",
+        help="flag to record videos of episodes",
+    )
+    parser.add_argument(
+        "--video-folder",
+        default="videos",
+        help="path to videos folder",
+    )
     args = parser.parse_args()
     return args
+
+
+def create_full_gif(video_folder: str) -> None:
+    clips = [
+        VideoFileClip(filename=os.path.join(video_folder, filename))
+        for filename in glob.glob("*.mp4", root_dir=video_folder)
+    ]
+    full_clip = concatenate_videoclips(clips=clips)
+    full_clip.write_gif(
+        filename=os.path.join(video_folder, "rl-video-episodes.gif"),
+        verbose=False,
+    )
 
 
 def main() -> None:
     args = parse_args()
     env = gym.make(
         "gymnasium_mars_lander:gymnasium_mars_lander/MarsLander-v0",
-        render_mode="human",
+        render_mode="rgb_array" if args.record_video else "human",
     )
+    if args.record_video:
+        env = gym.wrappers.RecordVideo(
+            env,
+            video_folder=args.video_folder,
+            episode_trigger=lambda _: True,
+            disable_logger=True,
+        )
     model = PPO.load(path=args.path, env=env)
 
     total_reward = 0
@@ -50,6 +82,9 @@ def main() -> None:
 
     env.close()
     print("Total reward:", int(total_reward))
+
+    if args.record_video:
+        create_full_gif(video_folder=args.video_folder)
 
 
 if __name__ == "__main__":
