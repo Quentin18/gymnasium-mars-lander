@@ -39,7 +39,7 @@ quality = [
 ]
 
 [project.urls]
-Repository = "https://github.com/Quentin18/gymnasium-2048"
+Repository = "https://github.com/Quentin18/gymnasium-mars-lander"
 
 [tool.black]
 line-length = 88
