@@ -5,6 +5,8 @@
 Gymnasium environment for
 the [Mars Lander CodinGame optimization puzzle](https://www.codingame.com/multiplayer/optimization/mars-lander).
 
+![Demo](images/demo.gif)
+
 <table>
     <tbody>
         <tr>
@@ -112,10 +114,16 @@ python -m rl_zoo3.train \
   --eval-episodes 100 \
   --seed 42 \
   --gym-packages gymnasium_mars_lander \
-  --env-kwargs "episode:int(3)" \
   --conf-file hyperparams/ppo.yml \
   --progress
 ```
+
+Feel free to modify hyperparameters and tune the reward function with wrappers.
+
+To train an agent on episode 3, add the following flag: `--env-kwargs "episode:int(3)"`.
+
+**Note**: the agent saved in `rl-trained-agents/ppo/best_model.zip` was trained on episode 2 and is unable to solve test
+cases of episode 3.
 
 ### Enjoy a Trained Agent
 
