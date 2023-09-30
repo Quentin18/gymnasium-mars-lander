@@ -1,4 +1,7 @@
 gymnasium_mars_lander/MarsLander-v0:
+#  env_wrapper:
+#    - gymnasium_mars_lander.wrappers.EuclideanDistanceRewardWrapper
+#    - gymnasium_mars_lander.wrappers.NegativeRewardWrapper
   n_envs: 1
   n_timesteps: !!float 1e6
   policy: 'MultiInputPolicy'
