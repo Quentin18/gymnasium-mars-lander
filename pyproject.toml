@@ -23,22 +23,19 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 dependencies = [
-    "gymnasium==0.29.0",
-    "pygame==2.5.0",
+    "gymnasium==1.0.0",
+    "pygame==2.6.1",
 ]
 
 [project.optional-dependencies]
-extra = [
-    "matplotlib==3.8.0",
-    "moviepy==1.0.3",
-    "rl-zoo3==2.1.0",
+training = [
+    "matplotlib==3.10.0",
+    "moviepy==2.1.2",
+    "rl-zoo3==2.5.0",
+    "tensorboard==2.18.0",
 ]
-testing = ["pytest==7.4.2"]
-quality = [
-    "black==23.9.1",
-    "isort==5.12.0",
-    "pylint==2.17.5"
-]
+testing = ["pytest"]
+quality = ["black[d]", "isort", "pylint"]
 
 [project.urls]
 Repository = "https://github.com/Quentin18/gymnasium-mars-lander"

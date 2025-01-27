@@ -3,7 +3,7 @@ import glob
 import os.path
 
 import gymnasium as gym
-from moviepy.editor import VideoFileClip, concatenate_videoclips
+from moviepy import VideoFileClip, concatenate_videoclips
 from stable_baselines3 import PPO
 
 from gymnasium_mars_lander.envs.level import MARS_LANDER_TEST_CASES
