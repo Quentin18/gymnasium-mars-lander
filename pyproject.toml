@@ -66,3 +66,4 @@ disable = [
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = "-ra"
+filterwarnings = ["ignore::DeprecationWarning:pygame.*:"]
