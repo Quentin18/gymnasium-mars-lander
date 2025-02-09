@@ -45,10 +45,7 @@ def create_full_gif(video_folder: str) -> None:
         for filename in glob.glob("*.mp4", root_dir=video_folder)
     ]
     full_clip = concatenate_videoclips(clips=clips)
-    full_clip.write_gif(
-        filename=os.path.join(video_folder, "rl-video-episodes.gif"),
-        verbose=False,
-    )
+    full_clip.write_gif(os.path.join(video_folder, "rl-video-episodes.gif"))
 
 
 def main() -> None:

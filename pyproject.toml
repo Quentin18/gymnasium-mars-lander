@@ -23,16 +23,16 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 dependencies = [
-    "gymnasium==1.0.0",
+    "gymnasium==1.2.3",
     "pygame==2.6.1",
 ]
 
 [project.optional-dependencies]
 training = [
-    "matplotlib==3.10.0",
-    "moviepy==2.1.2",
-    "rl-zoo3==2.5.0",
-    "tensorboard==2.18.0",
+    "matplotlib==3.10.9",
+    "moviepy==2.2.1",
+    "rl-zoo3==2.8.0",
+    "tensorboard==2.20.0",
 ]
 testing = ["pytest"]
 quality = ["black[d]", "isort", "pylint"]
@@ -58,10 +58,11 @@ disable = [
     "invalid-name",
     "missing-function-docstring",
     "missing-module-docstring",
+    "too-many-arguments",
     "too-many-instance-attributes",
+    "too-many-positional-arguments",
 ]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = "-ra"
-filterwarnings = ["ignore::DeprecationWarning:pygame.*:"]

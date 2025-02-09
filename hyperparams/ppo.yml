@@ -2,20 +2,22 @@ gymnasium_mars_lander/MarsLander-v0:
 #  env_wrapper:
 #    - gymnasium_mars_lander.wrappers.EuclideanDistanceRewardWrapper
 #    - gymnasium_mars_lander.wrappers.NegativeRewardWrapper
-  n_envs: 1
   n_timesteps: !!float 1e6
-  policy: 'MultiInputPolicy'
-  n_steps: 8192
+  policy: "MlpPolicy"
+  n_steps: 2048
+  batch_size: 256
+  n_epochs: 10
   gamma: 0.995
-  learning_rate: 0.000005
-  ent_coef: 0.0005
-  use_sde: True
-  sde_sample_freq: 4
-  max_grad_norm: 0.2
-  vf_coef: 0.25
+  learning_rate: !!float 5e-5
+  clip_range: 0.2
+  ent_coef: 0.01
+  vf_coef: 0.5
+  max_grad_norm: 0.5
+  gae_lambda: 0.95
   policy_kwargs: "dict(
     log_std_init=-2,
     ortho_init=False,
     activation_fn=nn.ReLU,
     net_arch=dict(pi=[128, 128], vf=[128, 128])
   )"
+  n_envs: 8

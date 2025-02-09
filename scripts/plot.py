@@ -61,7 +61,7 @@ def main() -> None:
 
     for _ in range(args.n_samples):
         ground = np.array(test_case["ground"], dtype=np.float64)
-        rover = RoverState(test_case["rover"])
+        rover = RoverState(*test_case["rover"])
 
         # flip left-right
         if args.flip:

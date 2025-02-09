@@ -1,3 +1,5 @@
+import dataclasses
+import math
 import os
 from typing import Any
 
@@ -10,6 +12,7 @@ from gymnasium.core import ActType, ObsType, RenderFrame, SupportsFloat
 from gymnasium_mars_lander.envs import geometry
 from gymnasium_mars_lander.envs.level import MARS_LANDER_TEST_CASES
 from gymnasium_mars_lander.envs.rover_state import RoverState
+from gymnasium_mars_lander.envs.utils import minmax_scale
 
 BACKGROUND_COLOR = (0, 0, 0)
 GROUND_COLOR = (255, 0, 0)
@@ -29,13 +32,13 @@ class MarsLanderEnv(gym.Env):
     Reference: https://www.codingame.com/multiplayer/optimization/mars-lander
 
     Action Space:
-        Continuous values for angle of rotation and thrust power
+        - Angle between -15° and +15°
+        - Thrust power between -1 and +1
 
     Observation Space:
-        - ground: Surface of Mars as a broken line. 30 pairs of 2d points (x, y).
-        - landing: Start and end points of the flat section.
-        - rover: Rover state. 7 float numbers.
-
+        - Distances in 6 directions
+        - Rover horizontal and vertical speed, angle, power
+        - Horizontal and vertical distances relative to the middle of the landing area
     """
 
     metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 10}
@@ -44,36 +47,45 @@ class MarsLanderEnv(gym.Env):
         self,
         render_mode: str | None = None,
         episode: int = 2,
+        start: int = -1,
+        rotate_min: int = -90,
+        rotate_max: int = 90,
         eval_env: bool = False,
+        sequential_maps: bool = False,
     ) -> None:
         self.episode = episode
+        self.start = start
         self.eval_env = eval_env
+        self.sequential_maps = sequential_maps
+        self.test_index = -1
 
         self.gravity = 3.711  # meters/sec^2
         self.scene_width = 7000  # meters
         self.scene_height = 3000  # meters
         self.speed_max = 500  # meters/sec
         self.fuel_max = 2000  # liters
-        self.rotate_min = -90  # degrees
-        self.rotate_max = 90  # degrees
+        self.rotate_min = rotate_min  # degrees
+        self.rotate_max = rotate_max  # degrees
         self.rotate_max_step = 15  # degrees
         self.power_min = 0
         self.power_max = 4
         self.power_max_step = 1
+        self.distance_max = float(np.linalg.norm([self.scene_width, self.scene_height]))
+        self.sensor_angles = [-10, -45, -90, -135, -170, 90]
 
-        self.observation_space = spaces.Dict(
-            {
-                "ground": spaces.Box(low=0, high=1, shape=(30, 2), dtype=np.float64),
-                "landing": spaces.Box(low=0, high=1, shape=(2, 2), dtype=np.float64),
-                "rover": spaces.Box(
-                    low=np.array([0, 0, -1, -1, 0, -1, 0]),
-                    high=np.array([1, 1, 1, 1, 1, 1, 1]),
-                    dtype=np.float64,
-                ),
-            }
+        self.observation_space = spaces.Box(
+            low=-1,
+            high=1,
+            shape=(len(self.sensor_angles) + 6,),
+            dtype=np.float32,
         )
 
-        self.action_space = spaces.Box(low=-1, high=1, shape=(2,), dtype=np.float64)
+        self.action_space = spaces.Box(
+            low=-1,
+            high=1,
+            shape=(2,),
+            dtype=np.float32,
+        )
 
         assert render_mode is None or render_mode in self.metadata["render_modes"]
         self.render_mode = render_mode
@@ -83,34 +95,21 @@ class MarsLanderEnv(gym.Env):
         self.font = None
         self.rover_img = None
 
-    def _get_obs(self) -> ObsType:
-        observation = {
-            "ground": (self.ground / [self.scene_width, self.scene_height]).astype(
-                np.float64
-            ),
-            "landing": (
-                self.ground[self.landing_area] / [self.scene_width, self.scene_height]
-            ).astype(np.float64),
-            "rover": (
-                np.rint(self.rover.numpy())
-                / [
-                    self.scene_width,
-                    self.scene_height,
-                    self.speed_max,
-                    self.speed_max,
-                    self.fuel_max,
-                    self.rotate_max,
-                    self.power_max,
-                ]
-            ).astype(np.float64),
-        }
-        return observation
-
     def _generate_random_input(self) -> tuple[np.ndarray, RoverState]:
         test_cases = MARS_LANDER_TEST_CASES[self.episode - 1]
-        test_index = self.np_random.choice(np.arange(len(test_cases)))
-        ground = np.array(test_cases[test_index]["ground"], dtype=np.float64)
-        rover = RoverState(test_cases[test_index]["rover"])
+
+        if self.sequential_maps:
+            self.test_index = (self.test_index + 1) % len(test_cases)
+        else:
+            self.test_index = self.np_random.choice(len(test_cases))
+
+        test_case = test_cases[self.test_index]
+
+        ground = np.array(test_case["ground"], dtype=self.observation_space.dtype)
+        rover = RoverState(*test_case["rover"])
+        if self.start >= 0:
+            rover.x, rover.y = test_case["starts"][self.start]
+            rover.vx = rover.vy = rover.rotate = rover.power = 0
 
         # flip left-right
         if not self.eval_env and self.np_random.random() < 0.5:
@@ -119,10 +118,6 @@ class MarsLanderEnv(gym.Env):
             rover.x = self.scene_width - rover.x
             rover.vx *= -1
             rover.rotate *= -1
-
-        # add fuel randomly
-        if not self.eval_env:
-            rover.fuel += self.np_random.uniform(0, 50)
 
         # shift rover randomly
         rover.y += self.np_random.uniform(-50, 50)
@@ -139,9 +134,95 @@ class MarsLanderEnv(gym.Env):
         ground[-1, 0] = self.scene_width - 1
         rover.x = np.clip(rover.x, 0, self.scene_width)
         rover.y = np.clip(rover.y, 0, self.scene_height)
-        rover.fuel = np.clip(rover.fuel, 0, self.fuel_max)
 
         return ground, rover
+
+    def _get_sensors_intersection(self) -> tuple[np.ndarray, np.ndarray]:
+        points = []
+        distances = []
+
+        segments = [
+            *list(zip(self.ground[:-1], self.ground[1:])),
+            [(0, 0), (0, self.scene_height)],
+            [(0, self.scene_height), (self.scene_width, self.scene_height)],
+            [(self.scene_width, self.scene_height), (self.scene_width, 0)],
+            [(self.scene_width, 0), (0, 0)],
+        ]
+
+        for angle in self.sensor_angles:
+            sensor_pos = geometry.get_target_pos(
+                pos=self.rover.position(),
+                distance=self.distance_max,
+                angle=angle,
+            )
+            min_point = (math.nan, math.nan)
+            min_distance = math.inf
+
+            for segment_start, segment_end in segments:
+                intersection = geometry.segment_intersection(
+                    self.rover.position(),
+                    sensor_pos,
+                    segment_start,
+                    segment_end,
+                )
+                if intersection is None:
+                    continue
+
+                d = math.dist(self.rover.position(), intersection)
+                if d < min_distance:
+                    min_point = intersection
+                    min_distance = d
+
+            points.append(min_point)
+            distances.append(0.0 if math.isinf(min_distance) else min_distance)
+
+        return (
+            np.array(points, dtype=self.observation_space.dtype),
+            np.array(distances, dtype=self.observation_space.dtype),
+        )
+
+    def _get_rover_obs(self) -> np.ndarray:
+        return np.array(
+            [
+                minmax_scale(self.rover.vx, -self.speed_max, self.speed_max),
+                minmax_scale(self.rover.vy, -self.speed_max, self.speed_max),
+                minmax_scale(self.rover.rotate, self.rotate_min, self.rotate_max),
+                minmax_scale(self.rover.power, self.power_min, self.power_max),
+            ],
+            dtype=self.observation_space.dtype,
+        )
+
+    def _get_landing_area_center(self) -> np.ndarray:
+        return self.ground[self.landing_area].mean(axis=0)
+
+    def _get_landing_area_obs(self) -> np.ndarray:
+        target_x, target_y = self.landing_area_center
+        return np.array(
+            [
+                minmax_scale(
+                    target_x - self.rover.x,
+                    -self.distance_max,
+                    self.distance_max,
+                ),
+                minmax_scale(
+                    target_y - self.rover.y,
+                    -self.distance_max,
+                    self.distance_max,
+                ),
+            ],
+            dtype=self.observation_space.dtype,
+        )
+
+    def _get_obs(self) -> ObsType:
+        _, sensor_distances = self._get_sensors_intersection()
+        return np.concat(
+            [
+                2 * sensor_distances / self.distance_max - 1,
+                self._get_rover_obs(),
+                self._get_landing_area_obs(),
+            ],
+            dtype=self.observation_space.dtype,
+        )
 
     def reset(
         self,
@@ -152,16 +233,16 @@ class MarsLanderEnv(gym.Env):
         super().reset(seed=seed)
 
         if options is not None and "ground" in options and "rover" in options:
-            self.ground = np.array(options["ground"], dtype=np.float64)
-            self.rover = RoverState(options["rover"])
+            self.ground = np.array(
+                options["ground"],
+                dtype=self.observation_space.dtype,
+            )
+            self.rover = RoverState(*options["rover"])
         else:
             self.ground, self.rover = self._generate_random_input()
 
-        self.ground = geometry.convert_to_fixed_length_polygon(
-            polygon=self.ground,
-            n=self.observation_space["ground"].shape[0],
-        )
         self.landing_area = geometry.find_flat_segment(polygon=self.ground)
+        self.landing_area_center = self._get_landing_area_center()
 
         observation = self._get_obs()
         info = {}
@@ -216,12 +297,15 @@ class MarsLanderEnv(gym.Env):
             action
         ), f"{action!r} ({type(action)}) invalid"
 
-        prev_rotate = self.rover.rotate
+        prev_state = dataclasses.replace(self.rover)
+        prev_dist = math.dist(self.rover.position(), self.landing_area_center)
+
         rotate, power = self._convert_action_to_rotate_power(action=action)
         self._update_state(rotate=rotate, power=power)
 
         observation = self._get_obs()
-        reward = 1
+        dist = math.dist(self.rover.position(), self.landing_area_center)
+        reward = 0.01 if dist < prev_dist else 0
         terminated = False
         info = {}
 
@@ -234,6 +318,7 @@ class MarsLanderEnv(gym.Env):
             info["msg"] = "Rover is running away"
             reward = -150
             terminated = True
+            observation[: len(self.sensor_angles)] = 0
         elif self.rover.fuel < 0:
             info["msg"] = "Tank is empty"
             reward = -150
@@ -250,12 +335,8 @@ class MarsLanderEnv(gym.Env):
                 <= self.rover.x
                 <= self.ground[self.landing_area[1]][0]
             )
-            has_no_angle = (
-                int(abs(prev_rotate)) <= 15 and int(abs(self.rover.rotate)) <= 15
-            )
-            has_low_speed = (
-                int(abs(self.rover.vy)) <= 40 and int(abs(self.rover.vx)) <= 20
-            )
+            has_no_angle = abs(prev_state.rotate) <= 15 and abs(self.rover.rotate) <= 15
+            has_low_speed = abs(self.rover.vy) <= 40 and abs(self.rover.vx) <= 20
             mission_completed = on_flat_ground and has_no_angle and has_low_speed
 
             if not mission_completed:
@@ -268,8 +349,10 @@ class MarsLanderEnv(gym.Env):
                     reward = -100
             else:
                 info["msg"] = "Mission accomplished"
-                reward = self.rover.fuel
+                reward = 200 + self.rover.fuel
+
             terminated = True
+            observation[: len(self.sensor_angles)] = 0
 
         if self.render_mode == "human":
             self._render_frame()
@@ -334,9 +417,18 @@ class MarsLanderEnv(gym.Env):
         canvas = pygame.transform.flip(surface=canvas, flip_x=False, flip_y=True)
 
         # Draw rover state
-        for i, (name, value) in enumerate(zip(self.rover.names(), self.rover.numpy())):
+        state_dict = {
+            "position": self.rover.x,
+            "altitude": self.rover.y,
+            "horizontal speed": self.rover.vx,
+            "vertical speed": self.rover.vy,
+            "fuel": self.rover.fuel,
+            "rotate": self.rover.rotate,
+            "power": self.rover.power,
+        }
+        for i, (key, value) in enumerate(state_dict.items()):
             text_surface = self.font.render(
-                f"{name.upper():<20} {int(value)}",
+                f"{key.upper():<20} {int(value)}",
                 True,
                 FONT_COLOR,
             )

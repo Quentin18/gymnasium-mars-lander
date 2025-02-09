@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 
 
@@ -122,3 +124,36 @@ def is_inside_ground(ground: np.ndarray, x: float, y: float, y_max: float) -> bo
         if segment_intersect(start, end, pos, top):
             intersection_count += 1
     return bool(intersection_count % 2)
+
+
+def get_target_pos(
+    pos: tuple[float, float],
+    distance: float,
+    angle: float,
+) -> tuple[float, float]:
+    x, y = pos
+    radians = math.radians(angle)
+    target_x = x + distance * math.cos(radians)
+    target_y = y + distance * math.sin(radians)
+    return target_x, target_y
+
+
+def segment_intersection(
+    a: tuple[float, float],
+    b: tuple[float, float],
+    c: tuple[float, float],
+    d: tuple[float, float],
+) -> tuple[float, float] | None:
+    denominator = (c[0] - d[0]) * (a[1] - b[1]) - (c[1] - d[1]) * (a[0] - b[0])
+    if denominator == 0:
+        return None
+
+    t = ((c[0] - a[0]) * (a[1] - b[1]) - (c[1] - a[1]) * (a[0] - b[0])) / denominator
+    u = ((c[0] - a[0]) * (c[1] - d[1]) - (c[1] - a[1]) * (c[0] - d[0])) / denominator
+
+    if 0 <= t <= 1 and u >= 0:
+        intersect_x = c[0] + t * (d[0] - c[0])
+        intersect_y = c[1] + t * (d[1] - c[1])
+        return intersect_x, intersect_y
+
+    return None
