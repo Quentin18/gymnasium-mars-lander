@@ -48,8 +48,6 @@ class MarsLanderEnv(gym.Env):
         render_mode: str | None = None,
         episode: int = 2,
         start: int = -1,
-        rotate_min: int = -90,
-        rotate_max: int = 90,
         eval_env: bool = False,
         sequential_maps: bool = False,
     ) -> None:
@@ -64,8 +62,8 @@ class MarsLanderEnv(gym.Env):
         self.scene_height = 3000  # meters
         self.speed_max = 500  # meters/sec
         self.fuel_max = 2000  # liters
-        self.rotate_min = rotate_min  # degrees
-        self.rotate_max = rotate_max  # degrees
+        self.rotate_min = -90  # degrees
+        self.rotate_max = 90  # degrees
         self.rotate_max_step = 15  # degrees
         self.power_min = 0
         self.power_max = 4
