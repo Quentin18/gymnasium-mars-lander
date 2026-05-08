@@ -1,9 +1,13 @@
-# gymnasium-mars-lander
+# Gymnasium Mars Lander
 
 [![codestyle](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-Gymnasium environment for
-the [Mars Lander CodinGame optimization puzzle](https://www.codingame.com/multiplayer/optimization/mars-lander).
+Gymnasium environment for the Mars Lander CodinGame puzzles:
+
+- [Mars Lander - Episode 1](https://www.codingame.com/training/easy/mars-lander-episode-1)
+- [Mars Lander - Episode 2](https://www.codingame.com/training/easy/mars-lander-episode-2)
+- [Mars Lander - Episode 3](https://www.codingame.com/training/easy/mars-lander-episode-3)
+- [Mars Lander - Optimization](https://www.codingame.com/multiplayer/optimization/mars-lander)
 
 ![Demo](images/demo.gif)
 
@@ -11,17 +15,11 @@ the [Mars Lander CodinGame optimization puzzle](https://www.codingame.com/multip
     <tbody>
         <tr>
             <td>Action Space</td>
-            <td><code>Box(low=-1, high=1, shape=(2,))</code></td>
+            <td><code>Box(-1, 1, (2,), float32)</code></td>
         </tr>
         <tr>
             <td>Observation Space</td>
-            <td>
-                <ul>
-                    <li>ground: <code>Box(low=0, high=1, shape=(30, 2))</code></li>
-                    <li>landing: <code>Box(low=0, high=1, shape=(2, 2))</code></li>
-                    <li>rover: <code>Box(low=np.array([0, 0, -1, -1, 0, -1, 0]), high=np.array([1, 1, 1, 1, 1, 1, 1]))</code></li>
-                </ul>
-            </td>
+            <td><code>Box(-1, 1, (12,), float32)</code></td>
         </tr>
         <tr>
             <td>Import</td>
@@ -49,7 +47,9 @@ cd gymnasium-mars-lander/
 pip install -e .
 ```
 
-## Action Space
+## Environment
+
+### Action Space
 
 The action is a `ndarray` with two continuous variables:
 
@@ -58,35 +58,62 @@ The action is a `ndarray` with two continuous variables:
 
 The values are normalized between -1 and 1.
 
-## Observation Space
+### Observation Space
 
-The observation is a `dict` with three `ndarray` of continuous variables:
+The observation is a `ndarray` of 12 continuous variables:
 
-- The `ground` part represents the x and y coordinates of the points on the ground line. We bring the number of points
-  to 30 by adding intermediate points.
-- The `landing` part represents the x and y coordinates of the two extremities of the flat section.
-- The `rover` part represents the current state of the rover. It is composed of 7 values: x and y position, horizontal
-  and vertical speed, fuel, angle and thrust.
+- The distances in six directions from the current position.
+- The rower horizontal and vertical speed, angle and thrust.
+- The horizontal and vertical distances to the middle of the landing area.
 
-The values are normalized between 0 and 1, or -1 and 1 if negative values are allowed.
+The values are normalized between -1 and 1.
 
-## Rewards
+### Rewards
 
 The rewards are described by the following table:
 
-| Condition                                                            | Reward                         |
-|----------------------------------------------------------------------|--------------------------------|
-| The rover leaves the frame                                           | `-150`                         |
-| The rover runs out of fuel                                           | `-150`                         |
-| The rover crashed outside flat ground with incorrect angle and speed | `-100`                         |
-| The rover crashed with correct angle and speed                       | `-75`                          |
-| The rover crashed on flat ground                                     | `-50`                          |
-| The rover is still flying                                            | `+1`                           |
-| The rover landed successfully                                        | Amount of remaining propellant |
+| Condition                                                            | Reward                                 |
+|----------------------------------------------------------------------|----------------------------------------|
+| The rover leaves the frame                                           | `-150`                                 |
+| The rover runs out of fuel                                           | `-150`                                 |
+| The rover crashes outside flat ground with incorrect angle and speed | `-100`                                 |
+| The rover crashes with correct angle and speed                       | `-75`                                  |
+| The rover crashes on flat ground                                     | `-50`                                  |
+| The rover approaches the landing area                                | `0.01`                                 |
+| The rover lands successfully                                         | `200` + Amount of remaining propellant |
 
-## Starting State
+### Starting State
 
-The starting state is generated by choosing a random CodinGame test case and applying some random augmentations.
+The starting state is generated by choosing a random CodinGame test case.
+When the `eval_env` argument is `False`, some random augmentations are applied to the test case.
+For each test case, there are five starting positions in increasing order of difficulty.
+The starting position can be set with the `start` argument.
+
+### Episode End
+
+The episode ends if either of the following happens:
+
+1. Termination: The rower lands on the landing area or runs out of fuel or crashes.
+2. Truncation: Episode length is greater than 2000.
+
+### Arguments
+
+- `episode`: episode number between 1 and 3. The default value is `2`.
+- `start`: starting position between -1 and 4. The default value is `-1`.
+- `eval_env`: if `True`, the random augmentations are disabled. The default value is `False`.
+- `sequential_maps`: if `True`, the maps are generated sequentially. The default value is `False`.
+
+```python
+import gymnasium as gym
+
+gym.make(
+    "gymnasium_mars_lander:gymnasium_mars_lander/MarsLander-v0",
+    episode=2,
+    start=-1,
+    eval_env=False,
+    sequential_maps=False,
+)
+```
 
 ## Usage
 
@@ -108,19 +135,16 @@ python -m rl_zoo3.train \
   --env gymnasium_mars_lander/MarsLander-v0 \
   --tensorboard-log logs \
   --trained-agent rl-trained-agents/ppo/best_model.zip \
-  --n-timesteps 1000000 \
+  --n-timesteps 10000000 \
   --log-interval 100 \
   --eval-freq 10000 \
   --eval-episodes 100 \
   --seed 42 \
   --gym-packages gymnasium_mars_lander \
   --conf-file hyperparams/ppo.yml \
-  --progress
+  --progress \
+  --env-kwargs "episode:int(2)" "start:int(-1)" "sequential_maps:True"
 ```
-
-Feel free to modify hyperparameters and tune the reward function with wrappers.
-
-To train an agent on episode 3, add the following flag: `--env-kwargs "episode:int(3)"`.
 
 **Note**: the agent saved in `rl-trained-agents/ppo/best_model.zip` was trained on episode 2 and is unable to solve test
 cases of episode 3.
@@ -138,7 +162,8 @@ python -m rl_zoo3.enjoy \
   --seed 42 \
   --gym-packages gymnasium_mars_lander \
   --load-best \
-  --progress
+  --progress \
+  --env-kwargs "episode:int(2)" "start:int(-1)" "sequential_maps:True"
 ```
 
 To see a trained agent in action on CodinGame test cases, execute:
@@ -163,9 +188,29 @@ To run tests, execute:
 pytest
 ```
 
+## Citing
+
+To cite the repository in publications:
+
+```bibtex
+@misc{gymnasium-mars-lander,
+  author = {Quentin Deschamps},
+  title = {Gymnasium Mars Lander},
+  year = {2026},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/Quentin18/gymnasium-mars-lander}},
+}
+```
+
 ## References
 
 - [Gymnasium](https://github.com/Farama-Foundation/Gymnasium)
 - [RL Baselines3 Zoo](https://github.com/DLR-RM/rl-baselines3-zoo)
 - [Stable Baselines3](https://github.com/DLR-RM/stable-baselines3)
 - [Mars Lander with Reinforcement Learning](https://github.com/antoinebrl/rl-mars-lander)
+- [CodinGame Forum - Mars Lander Puzzle discussion](https://www.codingame.com/forum/t/mars-lander-puzzle-discussion/32/338)
+
+## Author
+
+[Quentin Deschamps](mailto:quentindeschamps18@gmail.com)
