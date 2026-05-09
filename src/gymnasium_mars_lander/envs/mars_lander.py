@@ -222,6 +222,9 @@ class MarsLanderEnv(gym.Env):
             dtype=self.observation_space.dtype,
         )
 
+    def _get_info(self) -> dict[str, Any]:
+        return {"fuel": int(self.rover.fuel)}
+
     def reset(
         self,
         *,
@@ -243,7 +246,7 @@ class MarsLanderEnv(gym.Env):
         self.landing_area_center = self._get_landing_area_center()
 
         observation = self._get_obs()
-        info = {}
+        info = self._get_info()
 
         if self.render_mode == "human":
             self._render_frame()
@@ -305,7 +308,7 @@ class MarsLanderEnv(gym.Env):
         dist = math.dist(self.rover.position(), self.landing_area_center)
         reward = 0.01 if dist < prev_dist else 0
         terminated = False
-        info = {}
+        info = self._get_info()
 
         if not self.rover.is_within_bounds(
             x_min=0,

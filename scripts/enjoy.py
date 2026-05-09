@@ -63,22 +63,22 @@ def main() -> None:
         )
     model = PPO.load(path=args.path, env=env)
 
-    total_reward = 0
+    total_fuel = 0
     for test_case in MARS_LANDER_TEST_CASES[args.episode - 1]:
         observation, info = env.reset(options=test_case)
 
         while True:
             action, _ = model.predict(observation=observation, deterministic=True)
-            observation, reward, terminated, truncated, info = env.step(action)
+            observation, _reward, terminated, truncated, info = env.step(action)
 
             if terminated or truncated:
                 break
 
-        total_reward += reward
-        print(f"{test_case['name']: <30} {info['msg']: <25} {int(reward)}")
+        total_fuel += info["fuel"]
+        print(f"{test_case['name']: <30} {info['msg']: <25} {info['fuel']}")
 
     env.close()
-    print("Total reward:", int(total_reward))
+    print("Total fuel:", int(total_fuel))
 
     if args.record_video:
         create_full_gif(video_folder=args.video_folder)
