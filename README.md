@@ -115,6 +115,15 @@ gym.make(
 )
 ```
 
+## Trained agents
+
+There is one trained agent for each episode:
+
+| Path                                                                         | Episode |
+|------------------------------------------------------------------------------|---------|
+| `rl-trained-agents/ppo/gymnasium_mars_lander-MarsLander-v0_1/best_model.zip` | 1       |
+| `rl-trained-agents/ppo/gymnasium_mars_lander-MarsLander-v0_2/best_model.zip` | 2       |
+
 ## Usage
 
 You can use [RL Baselines3 Zoo](https://github.com/DLR-RM/rl-baselines3-zoo) to train and evaluate agents:
@@ -134,7 +143,7 @@ python -m rl_zoo3.train \
   --algo ppo \
   --env gymnasium_mars_lander/MarsLander-v0 \
   --tensorboard-log logs \
-  --trained-agent rl-trained-agents/ppo/best_model.zip \
+  --trained-agent rl-trained-agents/ppo/gymnasium_mars_lander-MarsLander-v0_2/best_model.zip \
   --n-timesteps 10000000 \
   --log-interval 100 \
   --eval-freq 10000 \
@@ -145,9 +154,6 @@ python -m rl_zoo3.train \
   --progress \
   --env-kwargs "episode:int(2)" "start:int(-1)" "sequential_maps:True"
 ```
-
-**Note**: the agent saved in `rl-trained-agents/ppo/best_model.zip` was trained on episode 2 and is unable to solve test
-cases of episode 3.
 
 ### Enjoy a Trained Agent
 
@@ -169,14 +175,14 @@ python -m rl_zoo3.enjoy \
 To see a trained agent in action on CodinGame test cases, execute:
 
 ```bash
-python -m scripts.enjoy --path rl-trained-agents/ppo/best_model.zip
+python -m scripts.enjoy --path rl-trained-agents/ppo/gymnasium_mars_lander-MarsLander-v0_2/best_model.zip
 ```
 
 To record videos of a trained agent in action on CodinGame test cases, execute:
 
 ```bash
 python -m scripts.enjoy \
-  --path rl-trained-agents/ppo/best_model.zip \
+  --path rl-trained-agents/ppo/gymnasium_mars_lander-MarsLander-v0_2/best_model.zip \
   --record-video
 ```
 
