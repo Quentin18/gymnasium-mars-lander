@@ -1,4 +1,3 @@
-# pylint: disable=protected-access,redefined-outer-name
 import gymnasium as gym
 import numpy as np
 import pytest
@@ -102,6 +101,7 @@ def test_collision(env: MarsLanderEnv):
             "rover": (6500, 2800, -100, 0, 600, 90, 0),
         }
     )
+    expected_final_step = 39
 
     # When
     for i in range(70):
@@ -110,7 +110,7 @@ def test_collision(env: MarsLanderEnv):
             break
 
     # Then
-    assert i == 39
+    assert i == expected_final_step
     assert reward < 0
 
 
@@ -136,6 +136,7 @@ def test_rover_exits_field_of_view(env: MarsLanderEnv):
             "rover": (6500, 2800, -100, 0, 600, 90, 0),
         }
     )
+    expected_final_step = 54
 
     # When
     for i in range(6):
@@ -146,7 +147,7 @@ def test_rover_exits_field_of_view(env: MarsLanderEnv):
             break
 
     # Then
-    assert i == 54
+    assert i == expected_final_step
     assert reward < 0
 
 
@@ -168,6 +169,7 @@ def test_successful_landing(env: MarsLanderEnv):
             "rover": (2500, 2500, 0, 0, 500, 0, 0),
         }
     )
+    expected_final_step = 64
 
     # When
     # Boost speed to max
@@ -182,5 +184,5 @@ def test_successful_landing(env: MarsLanderEnv):
         _, reward, terminated, truncated, _ = env.step([0, 1])
 
     # Then
-    assert i == 64
+    assert i == expected_final_step
     assert reward >= 0

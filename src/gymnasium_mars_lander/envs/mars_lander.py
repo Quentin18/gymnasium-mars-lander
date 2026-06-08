@@ -22,6 +22,11 @@ FONT_NAME = "Monospace"
 FONT_COLOR = (255, 255, 255)
 FONT_SIZE = 100
 
+FLIP_PROBABILITY = 0.5
+LOW_ANGLE_THRESHOLD = 15
+LOW_VERTICAL_SPEED_THRESHOLD = 40
+LOW_HORIZONTAL_SPEED_THRESHOLD = 20
+
 DIRNAME = os.path.dirname(os.path.abspath(__file__))
 ROVER_IMG_FILENAME = os.path.join(DIRNAME, "assets", "rover.png")
 
@@ -110,7 +115,7 @@ class MarsLanderEnv(gym.Env):
             rover.vx = rover.vy = rover.rotate = rover.power = 0
 
         # flip left-right
-        if not self.eval_env and self.np_random.random() < 0.5:
+        if not self.eval_env and self.np_random.random() < FLIP_PROBABILITY:
             ground[:, 0] = self.scene_width - ground[:, 0]
             ground = ground[::-1]
             rover.x = self.scene_width - rover.x
@@ -294,9 +299,9 @@ class MarsLanderEnv(gym.Env):
         self,
         action: ActType,
     ) -> tuple[ObsType, SupportsFloat, bool, bool, dict[str, Any]]:
-        assert self.action_space.contains(
-            action
-        ), f"{action!r} ({type(action)}) invalid"
+        assert self.action_space.contains(action), (
+            f"{action!r} ({type(action)}) invalid"
+        )
 
         prev_state = dataclasses.replace(self.rover)
         prev_dist = math.dist(self.rover.position(), self.landing_area_center)
@@ -336,8 +341,14 @@ class MarsLanderEnv(gym.Env):
                 <= self.rover.x
                 <= self.ground[self.landing_area[1]][0]
             )
-            has_no_angle = abs(prev_state.rotate) <= 15 and abs(self.rover.rotate) <= 15
-            has_low_speed = abs(self.rover.vy) <= 40 and abs(self.rover.vx) <= 20
+            has_no_angle = (
+                abs(prev_state.rotate) <= LOW_ANGLE_THRESHOLD
+                and abs(self.rover.rotate) <= LOW_ANGLE_THRESHOLD
+            )
+            has_low_speed = (
+                abs(self.rover.vy) <= LOW_VERTICAL_SPEED_THRESHOLD
+                and abs(self.rover.vx) <= LOW_HORIZONTAL_SPEED_THRESHOLD
+            )
             mission_completed = on_flat_ground and has_no_angle and has_low_speed
 
             if not mission_completed:
@@ -366,7 +377,7 @@ class MarsLanderEnv(gym.Env):
 
     def _render_frame(self) -> RenderFrame | list[RenderFrame]:
         if self.window is None and self.render_mode == "human":
-            pygame.init()  # pylint: disable=no-member
+            pygame.init()
             pygame.display.init()
             self.window = pygame.display.set_mode(
                 (self.scene_width // SCALE_FACTOR, self.scene_height // SCALE_FACTOR)
@@ -449,4 +460,4 @@ class MarsLanderEnv(gym.Env):
     def close(self) -> None:
         if self.window is not None:
             pygame.display.quit()
-            pygame.quit()  # pylint: disable=no-member
+            pygame.quit()
