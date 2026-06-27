@@ -1,13 +1,12 @@
 import dataclasses
 import math
 import os
-from typing import Any
+from typing import Any, cast
 
 import gymnasium as gym
 import numpy as np
 import pygame
 from gymnasium import spaces
-from gymnasium.core import ActType, ObsType, RenderFrame, SupportsFloat
 
 from gymnasium_mars_lander.envs import geometry
 from gymnasium_mars_lander.envs.level import MARS_LANDER_TEST_CASES
@@ -31,7 +30,7 @@ DIRNAME = os.path.dirname(os.path.abspath(__file__))
 ROVER_IMG_FILENAME = os.path.join(DIRNAME, "assets", "rover.png")
 
 
-class MarsLanderEnv(gym.Env):
+class MarsLanderEnv(gym.Env[np.ndarray, np.ndarray]):
     """Environment for the Mars Lander CodinGame optimization game.
 
     Reference: https://www.codingame.com/multiplayer/optimization/mars-lander
@@ -90,7 +89,8 @@ class MarsLanderEnv(gym.Env):
             dtype=np.float32,
         )
 
-        assert render_mode is None or render_mode in self.metadata["render_modes"]
+        render_modes = cast(list[str], self.metadata["render_modes"])
+        assert render_mode is None or render_mode in render_modes
         self.render_mode = render_mode
 
         self.window = None
@@ -108,10 +108,10 @@ class MarsLanderEnv(gym.Env):
 
         test_case = test_cases[self.test_index]
 
-        ground = np.array(test_case["ground"], dtype=self.observation_space.dtype)
-        rover = RoverState(*test_case["rover"])
+        ground = np.array(test_case.ground, dtype=self.observation_space.dtype)
+        rover = RoverState(*test_case.rover)
         if self.start >= 0:
-            rover.x, rover.y = test_case["starts"][self.start]
+            rover.x, rover.y = test_case.starts[self.start]
             rover.vx = rover.vy = rover.rotate = rover.power = 0
 
         # flip left-right
@@ -216,7 +216,7 @@ class MarsLanderEnv(gym.Env):
             dtype=self.observation_space.dtype,
         )
 
-    def _get_obs(self) -> ObsType:
+    def _get_obs(self) -> np.ndarray:
         _, sensor_distances = self._get_sensors_intersection()
         return np.concat(
             [
@@ -235,7 +235,7 @@ class MarsLanderEnv(gym.Env):
         *,
         seed: int | None = None,
         options: dict[str, Any] | None = None,
-    ) -> tuple[ObsType, dict[str, Any]]:
+    ) -> tuple[np.ndarray, dict[str, Any]]:
         super().reset(seed=seed)
 
         if options is not None and "ground" in options and "rover" in options:
@@ -297,8 +297,8 @@ class MarsLanderEnv(gym.Env):
 
     def step(
         self,
-        action: ActType,
-    ) -> tuple[ObsType, SupportsFloat, bool, bool, dict[str, Any]]:
+        action: np.ndarray,
+    ) -> tuple[np.ndarray, float, bool, bool, dict[str, Any]]:
         assert self.action_space.contains(action), (
             f"{action!r} ({type(action)}) invalid"
         )
@@ -371,11 +371,12 @@ class MarsLanderEnv(gym.Env):
 
         return observation, reward, terminated, False, info
 
-    def render(self) -> RenderFrame | list[RenderFrame] | None:
+    def render(self) -> np.ndarray | list[np.ndarray] | None:
         if self.render_mode == "rgb_array":
             return self._render_frame()
+        return None
 
-    def _render_frame(self) -> RenderFrame | list[RenderFrame]:
+    def _render_frame(self) -> np.ndarray | list[np.ndarray] | None:
         if self.window is None and self.render_mode == "human":
             pygame.init()
             pygame.display.init()
@@ -447,15 +448,21 @@ class MarsLanderEnv(gym.Env):
             canvas.blit(source=text_surface, dest=(0, i * self.font.get_height()))
 
         if self.render_mode == "human":
+            assert self.window is not None
+            assert self.clock is not None
+
             self.window.blit(canvas, canvas.get_rect())
             pygame.event.pump()
             pygame.display.update()
-            self.clock.tick(self.metadata["render_fps"])
-        else:  # rgb_array
-            return np.transpose(
-                np.array(pygame.surfarray.pixels3d(canvas)),
-                axes=(1, 0, 2),
-            )
+            render_fps = cast(int, self.metadata["render_fps"])
+            self.clock.tick(render_fps)
+            return None
+
+        # rgb_array
+        return np.transpose(
+            np.array(pygame.surfarray.pixels3d(canvas)),
+            axes=(1, 0, 2),
+        )
 
     def close(self) -> None:
         if self.window is not None:

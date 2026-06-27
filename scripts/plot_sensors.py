@@ -53,7 +53,7 @@ def main() -> None:
 
     fig, ax = plt.subplots()
 
-    ground = np.array(test_case["ground"])
+    ground = np.array(test_case.ground)
     ax.plot(
         ground[:, 0],
         ground[:, 1],
@@ -61,7 +61,7 @@ def main() -> None:
         color="r",
     )
 
-    rover_pos = test_case["rover"][:2]
+    rover_pos = test_case.rover[:2]
     ax.plot(
         rover_pos[0],
         rover_pos[1],
@@ -116,7 +116,7 @@ def main() -> None:
             color="gray",
         )
 
-    ax.set_title(test_case["name"])
+    ax.set_title(test_case.name)
     ax.set_xlim(0, SCENE_WIDTH)
     ax.set_ylim(0, SCENE_HEIGHT)
     ax.grid(True)

@@ -14,7 +14,7 @@ def l2dist(x: np.ndarray, y: np.ndarray) -> float:
         Euclidean distance between x and y.
 
     """
-    return np.linalg.norm(x - y, ord=2)
+    return np.linalg.norm(x - y, ord=2).item()
 
 
 def convert_to_fixed_length_polygon(polygon: np.ndarray, n: int = 30) -> np.ndarray:

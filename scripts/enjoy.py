@@ -65,7 +65,12 @@ def main() -> None:
 
     total_fuel = 0
     for test_case in MARS_LANDER_TEST_CASES[args.episode - 1]:
-        observation, info = env.reset(options=test_case)
+        observation, info = env.reset(
+            options={
+                "ground": test_case.ground,
+                "rover": test_case.rover,
+            }
+        )
 
         while True:
             action, _ = model.predict(observation=observation, deterministic=True)
@@ -75,7 +80,7 @@ def main() -> None:
                 break
 
         total_fuel += info["fuel"]
-        print(f"{test_case['name']: <30} {info['msg']: <25} {info['fuel']}")
+        print(f"{test_case.name: <30} {info['msg']: <25} {info['fuel']}")
 
     env.close()
     print("Total fuel:", int(total_fuel))

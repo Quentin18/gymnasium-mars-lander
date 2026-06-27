@@ -15,11 +15,11 @@ def main() -> None:
     for episode, levels in enumerate(MARS_LANDER_TEST_CASES):
         for level in levels:
             ax = axes[ax_index]
-            ax.set_title(f"Episode {episode + 1} - {level['name']}")
+            ax.set_title(f"Episode {episode + 1} - {level.name}")
 
-            ground = np.array(level["ground"])
+            ground = np.array(level.ground)
 
-            for x, y in level["starts"]:
+            for x, y in level.starts:
                 ax.plot(x, y, marker="o", markersize=5)
 
             ax.plot(ground[:, 0], ground[:, 1], marker="x", color="r")

@@ -1,32 +1,42 @@
+from typing import NamedTuple
+
+
+class MarsLanderLevel(NamedTuple):
+    name: str
+    ground: list[tuple[int, int]]
+    rover: list[int]
+    starts: list[tuple[int, int]]
+
+
 # https://www.codingame.com/ide/puzzle/mars-lander
-MARS_LANDER_TEST_CASES = (
-    (
+MARS_LANDER_TEST_CASES = [
+    [
         # Episode I
-        {
-            "name": "Straight landing",
-            "ground": (
+        MarsLanderLevel(
+            name="Straight landing",
+            ground=[
                 (0, 100),
                 (1000, 500),
                 (1500, 100),
                 (3000, 100),
                 (5000, 1500),
                 (6999, 1000),
-            ),
-            "rover": (2500, 2500, 0, 0, 500, 0, 0),
-            "starts": (
+            ],
+            rover=[2500, 2500, 0, 0, 500, 0, 0],
+            starts=[
                 (2500, 500),
                 (2500, 1000),
                 (2500, 1500),
                 (2500, 2000),
                 (2500, 2500),
-            ),
-        },
-    ),
-    (
+            ],
+        ),
+    ],
+    [
         # Episode II
-        {
-            "name": "Easy on the right",
-            "ground": (
+        MarsLanderLevel(
+            name="Easy on the right",
+            ground=[
                 (0, 100),
                 (1000, 500),
                 (1500, 1500),
@@ -34,19 +44,19 @@ MARS_LANDER_TEST_CASES = (
                 (4000, 150),
                 (5500, 150),
                 (6999, 800),
-            ),
-            "rover": (2500, 2700, 0, 0, 550, 0, 0),
-            "starts": (
+            ],
+            rover=[2500, 2700, 0, 0, 550, 0, 0],
+            starts=[
                 (5000, 500),
                 (4500, 1000),
                 (4000, 1500),
                 (3500, 2000),
                 (2500, 2700),
-            ),
-        },
-        {
-            "name": "Initial speed, correct side",
-            "ground": (
+            ],
+        ),
+        MarsLanderLevel(
+            name="Initial speed, correct side",
+            ground=[
                 (0, 100),
                 (1000, 500),
                 (1500, 100),
@@ -57,19 +67,19 @@ MARS_LANDER_TEST_CASES = (
                 (5800, 300),
                 (6000, 1000),
                 (6999, 2000),
-            ),
-            "rover": (6500, 2800, -100, 0, 600, 90, 0),
-            "starts": (
+            ],
+            rover=[6500, 2800, -100, 0, 600, 90, 0],
+            starts=[
                 (2500, 500),
                 (3000, 1000),
                 (3500, 1500),
                 (4500, 2000),
                 (6500, 2800),
-            ),
-        },
-        {
-            "name": "Initial speed, wrong side",
-            "ground": (
+            ],
+        ),
+        MarsLanderLevel(
+            name="Initial speed, wrong side",
+            ground=[
                 (0, 100),
                 (1000, 500),
                 (1500, 1500),
@@ -77,19 +87,19 @@ MARS_LANDER_TEST_CASES = (
                 (4000, 150),
                 (5500, 150),
                 (6999, 800),
-            ),
-            "rover": (6500, 2800, -90, 0, 750, 90, 0),
-            "starts": (
+            ],
+            rover=[6500, 2800, -90, 0, 750, 90, 0],
+            starts=[
                 (5000, 500),
                 (5500, 1000),
                 (5800, 1500),
                 (6000, 2000),
                 (6500, 2800),
-            ),
-        },
-        {
-            "name": "Deep canyon",
-            "ground": (
+            ],
+        ),
+        MarsLanderLevel(
+            name="Deep canyon",
+            ground=[
                 (0, 1000),
                 (300, 1500),
                 (350, 1400),
@@ -110,19 +120,19 @@ MARS_LANDER_TEST_CASES = (
                 (5000, 200),
                 (5500, 1500),
                 (6999, 2800),
-            ),
-            "rover": (500, 2700, 100, 0, 800, -90, 0),
-            "starts": (
+            ],
+            rover=[500, 2700, 100, 0, 800, -90, 0],
+            starts=[
                 (4500, 700),
                 (4500, 1500),
                 (4500, 2000),
                 (3500, 2500),
                 (500, 2700),
-            ),
-        },
-        {
-            "name": "High ground",
-            "ground": (
+            ],
+        ),
+        MarsLanderLevel(
+            name="High ground",
+            ground=[
                 (0, 1000),
                 (300, 1500),
                 (350, 1400),
@@ -143,22 +153,22 @@ MARS_LANDER_TEST_CASES = (
                 (6000, 500),
                 (6500, 300),
                 (6999, 500),
-            ),
-            "rover": (6500, 2700, -50, 0, 1000, 90, 0),
-            "starts": (
+            ],
+            rover=[6500, 2700, -50, 0, 1000, 90, 0],
+            starts=[
                 (1000, 2700),
                 (2500, 2700),
                 (3500, 2700),
                 (4500, 2700),
                 (6500, 2700),
-            ),
-        },
-    ),
-    (
+            ],
+        ),
+    ],
+    [
         # Episode III
-        {
-            "name": "Cave, correct side",
-            "ground": (
+        MarsLanderLevel(
+            name="Cave, correct side",
+            ground=[
                 (0, 450),
                 (300, 750),
                 (1000, 450),
@@ -181,19 +191,19 @@ MARS_LANDER_TEST_CASES = (
                 (5500, 1500),
                 (6000, 950),
                 (6999, 1750),
-            ),
-            "rover": (6500, 2600, -20, 0, 1000, 45, 0),
-            "starts": (
+            ],
+            rover=[6500, 2600, -20, 0, 1000, 45, 0],
+            starts=[
                 (3000, 800),
                 (3500, 1300),
                 (4500, 2000),
                 (5500, 2300),
                 (6500, 2600),
-            ),
-        },
-        {
-            "name": "Cave, wrong side",
-            "ground": (
+            ],
+        ),
+        MarsLanderLevel(
+            name="Cave, wrong side",
+            ground=[
                 (0, 1800),
                 (300, 1200),
                 (1000, 1550),
@@ -212,15 +222,15 @@ MARS_LANDER_TEST_CASES = (
                 (5500, 500),
                 (6200, 800),
                 (6999, 600),
-            ),
-            "rover": (6500, 2000, 0, 0, 1200, 0, 0),
-            "starts": (
+            ],
+            rover=[6500, 2000, 0, 0, 1200, 0, 0],
+            starts=[
                 (4000, 1000),
                 (3500, 1300),
                 (3000, 2300),
                 (5000, 2500),
                 (6500, 2000),
-            ),
-        },
-    ),
-)
+            ],
+        ),
+    ],
+]
