@@ -49,6 +49,12 @@ cd gymnasium-mars-lander/
 pip install -e .
 ```
 
+For running on CPU with extras:
+
+```bash
+pip install -e .[training,testing,quality] --extra-index-url https://download.pytorch.org/whl/cpu
+```
+
 ## Environment
 
 ### Action Space
