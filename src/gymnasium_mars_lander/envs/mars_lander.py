@@ -43,6 +43,7 @@ class MarsLanderEnv(gym.Env[np.ndarray, np.ndarray]):
         - Distances in 6 directions
         - Rover horizontal and vertical speed, angle, power
         - Horizontal and vertical distances relative to the middle of the landing area
+        - Boolean indicating whether the rover can see the landing area
     """
 
     metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 10}
@@ -78,7 +79,7 @@ class MarsLanderEnv(gym.Env[np.ndarray, np.ndarray]):
         self.observation_space = spaces.Box(
             low=-1,
             high=1,
-            shape=(len(self.sensor_angles) + 6,),
+            shape=(len(self.sensor_angles) + 7,),
             dtype=np.float32,
         )
 
@@ -216,13 +217,32 @@ class MarsLanderEnv(gym.Env[np.ndarray, np.ndarray]):
             dtype=self.observation_space.dtype,
         )
 
+    def can_see_landing_area(self) -> bool:
+        for segment_start, segment_end in zip(self.ground[:-1], self.ground[1:]):
+            # Ignore landing area
+            if segment_start[1] == segment_end[1]:
+                continue
+
+            intersection = geometry.segment_intersection(
+                self.rover.position(),
+                (self.landing_area_center[0], self.landing_area_center[1]),
+                segment_start,
+                segment_end,
+            )
+
+            if intersection is not None:
+                return False
+
+        return True
+
     def _get_obs(self) -> np.ndarray:
         _, sensor_distances = self._get_sensors_intersection()
-        return np.concat(
+        return np.concatenate(
             [
                 2 * sensor_distances / self.distance_max - 1,
                 self._get_rover_obs(),
                 self._get_landing_area_obs(),
+                [1 if self.can_see_landing_area() else -1],
             ],
             dtype=self.observation_space.dtype,
         )

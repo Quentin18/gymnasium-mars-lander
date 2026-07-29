@@ -4,6 +4,7 @@ import pytest
 from gymnasium.utils.env_checker import check_env
 
 from gymnasium_mars_lander.envs import MarsLanderEnv
+from gymnasium_mars_lander.envs.level import MARS_LANDER_TEST_CASES, MarsLanderLevel
 from gymnasium_mars_lander.envs.rover_state import RoverState
 
 
@@ -195,3 +196,21 @@ def test_successful_landing(env: MarsLanderEnv):
     # Then
     assert i == expected_final_step
     assert reward >= 0
+
+
+@pytest.mark.parametrize(
+    "level,expected",
+    [
+        (MARS_LANDER_TEST_CASES[0][0], True),
+        (MARS_LANDER_TEST_CASES[1][0], True),
+        (MARS_LANDER_TEST_CASES[1][3], False),
+        (MARS_LANDER_TEST_CASES[2][1], False),
+    ],
+)
+def test_can_see_landing_area(
+    level: MarsLanderLevel,
+    expected: bool,
+    env: MarsLanderEnv,
+):
+    env.reset(options={"ground": level.ground, "rover": level.rover})
+    assert env.can_see_landing_area() == expected
