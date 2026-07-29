@@ -14,7 +14,7 @@ def env() -> MarsLanderEnv:
 
 
 def test_check_env():
-    env = gym.make("gymnasium_mars_lander/MarsLander-v0")
+    env = gym.make("gymnasium_mars_lander/MarsLander-v1")
     check_env(env=env.unwrapped)
 
 

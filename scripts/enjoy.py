@@ -51,7 +51,7 @@ def create_full_gif(video_folder: str) -> None:
 def main() -> None:
     args = parse_args()
     env = gym.make(
-        "gymnasium_mars_lander:gymnasium_mars_lander/MarsLander-v0",
+        "gymnasium_mars_lander:gymnasium_mars_lander/MarsLander-v1",
         render_mode="rgb_array" if args.record_video else "human",
     )
     if args.record_video:
