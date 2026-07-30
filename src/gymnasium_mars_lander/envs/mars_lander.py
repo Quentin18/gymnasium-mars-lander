@@ -7,6 +7,7 @@ import gymnasium as gym
 import numpy as np
 import pygame
 from gymnasium import spaces
+from gymnasium.core import RenderFrame
 
 from gymnasium_mars_lander.envs import geometry
 from gymnasium_mars_lander.envs.level import MARS_LANDER_TEST_CASES
@@ -391,12 +392,12 @@ class MarsLanderEnv(gym.Env[np.ndarray, np.ndarray]):
 
         return observation, reward, terminated, False, info
 
-    def render(self) -> np.ndarray | list[np.ndarray] | None:
+    def render(self) -> RenderFrame | list[RenderFrame] | None:
         if self.render_mode == "rgb_array":
             return self._render_frame()
         return None
 
-    def _render_frame(self) -> np.ndarray | list[np.ndarray] | None:
+    def _render_frame(self) -> RenderFrame | list[RenderFrame] | None:
         if self.window is None and self.render_mode == "human":
             pygame.init()
             pygame.display.init()
