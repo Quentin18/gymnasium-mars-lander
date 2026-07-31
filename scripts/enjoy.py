@@ -63,8 +63,11 @@ def main() -> None:
         )
     model = PPO.load(path=args.path, env=env)
 
-    total_fuel = 0
-    for test_case in MARS_LANDER_TEST_CASES[args.episode - 1]:
+    fuel_left = 0
+    completion = 0
+    test_cases = MARS_LANDER_TEST_CASES[args.episode - 1]
+
+    for test_case in test_cases:
         observation, info = env.reset(
             options={
                 "ground": test_case.ground,
@@ -79,11 +82,19 @@ def main() -> None:
             if terminated or truncated:
                 break
 
-        total_fuel += info["fuel"]
-        print(f"{test_case.name: <30} {info['msg']: <25} {info['fuel']}")
+        if info["msg"] == "Mission accomplished":
+            fuel = info["fuel"]
+            completion += 1
+        else:
+            fuel = 0
+
+        fuel_left += fuel
+        print(f"{test_case.name: <30} {info['msg']: <25} {fuel}")
 
     env.close()
-    print("Total fuel:", int(total_fuel))
+    print(
+        f"Fuel left: {fuel_left} - Completion: {100 * completion / len(test_cases):.2f}%"
+    )
 
     if args.record_video:
         create_full_gif(video_folder=args.video_folder)
