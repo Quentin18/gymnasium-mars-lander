@@ -10,7 +10,7 @@ authors = [
 ]
 description = "A reinforcement learning environment for the Mars Lander CG puzzle"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 keywords = ["Reinforcement Learning", "game", "RL", "AI", "gymnasium", "pygame"]
 license = { text = "MIT" }
 classifiers = [
