@@ -18,3 +18,4 @@ gymnasium_mars_lander/MarsLander-v1:
     net_arch=dict(pi=[128, 128], vf=[128, 128])
   )"
   n_envs: 8
+  normalize: "{'norm_obs': False, 'norm_reward': True}"
