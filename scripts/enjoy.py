@@ -53,6 +53,7 @@ def main() -> None:
     env = gym.make(
         "gymnasium_mars_lander:gymnasium_mars_lander/MarsLander-v1",
         render_mode="rgb_array" if args.record_video else "human",
+        episode=args.episode,
     )
     if args.record_video:
         env = gym.wrappers.RecordVideo(

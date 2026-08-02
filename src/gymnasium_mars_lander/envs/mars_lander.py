@@ -22,6 +22,11 @@ FONT_NAME = "Monospace"
 FONT_COLOR = (255, 255, 255)
 FONT_SIZE = 100
 
+EPISODE_ROTATION_BOUNDS = {
+    1: (-45, 45),
+    2: (-90, 90),
+    3: (-45, 45),
+}
 FLIP_PROBABILITY = 0.5
 LOW_ANGLE_THRESHOLD = 15
 LOW_VERTICAL_SPEED_THRESHOLD = 40
@@ -68,8 +73,7 @@ class MarsLanderEnv(gym.Env[np.ndarray, np.ndarray]):
         self.scene_height = 3000  # meters
         self.speed_max = 500  # meters/sec
         self.fuel_max = 2000  # liters
-        self.rotate_min = -90  # degrees
-        self.rotate_max = 90  # degrees
+        self.rotate_min, self.rotate_max = EPISODE_ROTATION_BOUNDS[episode]  # degrees
         self.rotate_max_step = 15  # degrees
         self.power_min = 0
         self.power_max = 4
