@@ -11,8 +11,9 @@ Gymnasium environment for the Mars Lander CodinGame puzzles:
 - [Mars Lander - Episode 3](https://www.codingame.com/training/easy/mars-lander-episode-3)
 - [Mars Lander - Optimization](https://www.codingame.com/multiplayer/optimization/mars-lander)
 
-![Demo episode 2](images/demo_episode_2.gif)
-![Demo episode 3](images/demo_episode_3.gif)
+|                  Episode 2                   |                  Episode 3                   |
+|:--------------------------------------------:|:--------------------------------------------:|
+| ![Demo episode 2](images/demo_episode_2.gif) | ![Demo episode 3](images/demo_episode_3.gif) |
 
 <table>
     <tbody>
