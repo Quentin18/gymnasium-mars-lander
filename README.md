@@ -192,7 +192,7 @@ python -m rl_zoo3.enjoy \
   --algo ppo \
   --env gymnasium_mars_lander/MarsLander-v1 \
   --n-timesteps 1000 \
-  --exp-id 1 \
+  --exp-id 2 \
   --deterministic \
   --seed 42 \
   --gym-packages gymnasium_mars_lander \
@@ -207,7 +207,7 @@ To see a trained agent in action on CodinGame test cases, execute:
 
 ```bash
 python -m scripts.enjoy \
-  --path rl-trained-agents/ppo/gymnasium_mars_lander-MarsLander-v1_1/best_model.zip \
+  --path rl-trained-agents/ppo/gymnasium_mars_lander-MarsLander-v1_2/best_model.zip \
   --episode 2
 ```
 
@@ -215,7 +215,7 @@ To record videos of a trained agent in action on CodinGame test cases, execute:
 
 ```bash
 python -m scripts.enjoy \
-  --path rl-trained-agents/ppo/gymnasium_mars_lander-MarsLander-v1_1/best_model.zip \
+  --path rl-trained-agents/ppo/gymnasium_mars_lander-MarsLander-v1_2/best_model.zip \
   --episode 2 \
   --record-video
 ```
