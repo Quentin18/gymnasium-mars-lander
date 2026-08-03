@@ -1,5 +1,9 @@
 # Gymnasium Mars Lander
 
+[![Build Python Package](https://github.com/Quentin18/gymnasium-mars-lander/actions/workflows/build.yml/badge.svg)](https://github.com/Quentin18/gymnasium-mars-lander/actions/workflows/build.yml)
+[![Python](https://img.shields.io/pypi/pyversions/gymnasium-mars-lander.svg)](https://badge.fury.io/py/gymnasium-mars-lander)
+[![PyPI](https://badge.fury.io/py/gymnasium-mars-lander.svg)](https://badge.fury.io/py/gymnasium-mars-lander)
+[![PyPI Downloads](https://static.pepy.tech/badge/gymnasium-mars-lander)](https://pepy.tech/projects/gymnasium-mars-lander)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://pre-commit.com/)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![ty](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ty/main/assets/badge/v0.json)](https://github.com/astral-sh/ty)
