@@ -1,4 +1,4 @@
-gymnasium_mars_lander/MarsLander-v1:
+gymnasium_mars_lander/MarsLander-v1: &mars-lander-defaults
   n_timesteps: !!float 1e6
   policy: "MlpPolicy"
   n_steps: 2048
@@ -19,3 +19,6 @@ gymnasium_mars_lander/MarsLander-v1:
   )"
   n_envs: 8
   normalize: "{'norm_obs': False, 'norm_reward': True}"
+
+gymnasium_mars_lander/MarsLanderDiscrete-v1:
+  <<: *mars-lander-defaults

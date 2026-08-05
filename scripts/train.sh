@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 EPISODE="${1:-2}"
+ENV_NAME="${2:-MarsLander-v1}"
 LOG_DIR="logs"
 
 echo "Train episode ${EPISODE}"
@@ -14,20 +15,20 @@ case "$EPISODE" in
   2)
     STEPS=(
       "0 5000000 "
-      "1 5000000 ${LOG_DIR}/ppo/gymnasium_mars_lander-MarsLander-v1_1/best_model.zip"
-      "2 5000000 ${LOG_DIR}/ppo/gymnasium_mars_lander-MarsLander-v1_2/best_model.zip"
-      "3 5000000 ${LOG_DIR}/ppo/gymnasium_mars_lander-MarsLander-v1_3/best_model.zip"
-      "-1 20000000 ${LOG_DIR}/ppo/gymnasium_mars_lander-MarsLander-v1_4/best_model.zip"
+      "1 5000000 ${LOG_DIR}/ppo/gymnasium_mars_lander-${ENV_NAME}_1/best_model.zip"
+      "2 5000000 ${LOG_DIR}/ppo/gymnasium_mars_lander-${ENV_NAME}_2/best_model.zip"
+      "3 5000000 ${LOG_DIR}/ppo/gymnasium_mars_lander-${ENV_NAME}_3/best_model.zip"
+      "-1 20000000 ${LOG_DIR}/ppo/gymnasium_mars_lander-${ENV_NAME}_4/best_model.zip"
     )
     ;;
   3)
     STEPS=(
       "0 2000000 "
-      "1 2000000 ${LOG_DIR}/ppo/gymnasium_mars_lander-MarsLander-v1_1/best_model.zip"
-      "2 5000000 ${LOG_DIR}/ppo/gymnasium_mars_lander-MarsLander-v1_2/best_model.zip"
-      "3 5000000 ${LOG_DIR}/ppo/gymnasium_mars_lander-MarsLander-v1_3/best_model.zip"
-      "-1 10000000 ${LOG_DIR}/ppo/gymnasium_mars_lander-MarsLander-v1_4/best_model.zip"
-      "-1 2000000 ${LOG_DIR}/ppo/gymnasium_mars_lander-MarsLander-v1_5/best_model.zip"
+      "1 2000000 ${LOG_DIR}/ppo/gymnasium_mars_lander-${ENV_NAME}_1/best_model.zip"
+      "2 5000000 ${LOG_DIR}/ppo/gymnasium_mars_lander-${ENV_NAME}_2/best_model.zip"
+      "3 5000000 ${LOG_DIR}/ppo/gymnasium_mars_lander-${ENV_NAME}_3/best_model.zip"
+      "-1 10000000 ${LOG_DIR}/ppo/gymnasium_mars_lander-${ENV_NAME}_4/best_model.zip"
+      "-1 2000000 ${LOG_DIR}/ppo/gymnasium_mars_lander-${ENV_NAME}_5/best_model.zip"
     )
     ;;
 esac
@@ -44,7 +45,7 @@ for step in "${STEPS[@]}"; do
 
   python -m rl_zoo3.train \
     --algo ppo \
-    --env gymnasium_mars_lander/MarsLander-v1 \
+    --env "gymnasium_mars_lander/${ENV_NAME}" \
     --tensorboard-log "$LOG_DIR" \
     --n-timesteps "$timesteps" \
     --log-interval 100 \

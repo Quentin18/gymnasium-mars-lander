@@ -1,6 +1,7 @@
 import dataclasses
 import math
 import os
+from itertools import product
 from typing import Any, cast
 
 import gymnasium as gym
@@ -493,3 +494,32 @@ class MarsLanderEnv(gym.Env[np.ndarray, np.ndarray]):
         if self.window is not None:
             pygame.display.quit()
             pygame.quit()
+
+
+class MarsLanderDiscreteEnv(MarsLanderEnv):
+    def __init__(
+        self,
+        render_mode: str | None = None,
+        episode: int = 2,
+        start: int = -1,
+        eval_env: bool = False,
+        sequential_maps: bool = False,
+    ) -> None:
+        super().__init__(
+            render_mode=render_mode,
+            episode=episode,
+            start=start,
+            eval_env=eval_env,
+            sequential_maps=sequential_maps,
+        )
+
+        self.actions = list(
+            product(
+                [-self.rotate_max_step, 0, self.rotate_max_step],
+                [-1, 0, 1],
+            )
+        )
+        self.action_space = spaces.Discrete(len(self.actions))  # type: ignore
+
+    def _convert_action_to_rotate_power(self, action: int) -> tuple[int, int]:  # type: ignore
+        return self.actions[action]

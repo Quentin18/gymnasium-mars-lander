@@ -19,6 +19,12 @@ def parse_args() -> argparse.Namespace:
         help="path to model file",
     )
     parser.add_argument(
+        "--env",
+        default="MarsLander-v1",
+        choices=("MarsLanderDiscrete-v1", "MarsLander-v1"),
+        help="environment name",
+    )
+    parser.add_argument(
         "-e",
         "--episode",
         default=2,
@@ -51,7 +57,7 @@ def create_full_gif(video_folder: str) -> None:
 def main() -> None:
     args = parse_args()
     env = gym.make(
-        "gymnasium_mars_lander:gymnasium_mars_lander/MarsLander-v1",
+        f"gymnasium_mars_lander:gymnasium_mars_lander/{args.env}",
         render_mode="rgb_array" if args.record_video else "human",
         episode=args.episode,
     )
@@ -93,9 +99,8 @@ def main() -> None:
         print(f"{test_case.name: <30} {info['msg']: <25} {fuel}")
 
     env.close()
-    print(
-        f"Fuel left: {fuel_left} - Completion: {100 * completion / len(test_cases):.2f}%"
-    )
+    print(f"Fuel left: {fuel_left}")
+    print(f"Completion: {100 * completion / len(test_cases):.2f}%")
 
     if args.record_video:
         create_full_gif(video_folder=args.video_folder)

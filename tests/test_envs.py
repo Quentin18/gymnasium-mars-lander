@@ -13,8 +13,15 @@ def env() -> MarsLanderEnv:
     return MarsLanderEnv()
 
 
-def test_check_env():
-    env = gym.make("gymnasium_mars_lander/MarsLander-v1")
+@pytest.mark.parametrize(
+    "env_id",
+    (
+        "gymnasium_mars_lander/MarsLander-v1",
+        "gymnasium_mars_lander/MarsLanderDiscrete-v1",
+    ),
+)
+def test_check_env(env_id: str):
+    env = gym.make(env_id)
     check_env(env=env.unwrapped)
 
 
