@@ -45,8 +45,18 @@ target-version = "py310"
 
 [tool.ruff.lint]
 select = [
+    "E", # pycodestyle
+    "F", # Pyflakes
+    "UP", # pyupgrade
+    "B", # flake8-bugbear
+    "SIM", # flake8-simplify
     "I", # isort
     "PL", # pylint
+    "RUF",
+]
+ignore = [
+    "RUF007",
+    "RUF012",
 ]
 
 [tool.pytest.ini_options]

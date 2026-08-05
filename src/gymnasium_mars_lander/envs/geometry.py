@@ -32,7 +32,9 @@ def convert_to_fixed_length_polygon(polygon: np.ndarray, n: int = 30) -> np.ndar
         raise ValueError(f"The polygon has more than {n} nodes")
 
     while len(polygon) < n:
-        index_longest = np.argmax([l2dist(x, y) for x, y in zip(polygon, polygon[1:])])
+        index_longest = np.argmax(
+            [l2dist(x, y) for x, y in zip(polygon, polygon[1:], strict=False)]
+        )
         intermediate_point = [
             (polygon[index_longest][0] + polygon[index_longest + 1][0]) / 2,
             (polygon[index_longest][1] + polygon[index_longest + 1][1]) / 2,
@@ -56,7 +58,7 @@ def find_flat_segment(polygon: np.ndarray) -> list[int]:
     """
     start = -1
     end = -1
-    for i, (a, b) in enumerate(zip(polygon[:-1], polygon[1:])):
+    for i, (a, b) in enumerate(zip(polygon[:-1], polygon[1:], strict=False)):
         if a[1] == b[1]:
             if start < 0:
                 start = i
@@ -120,7 +122,7 @@ def is_inside_ground(ground: np.ndarray, x: float, y: float, y_max: float) -> bo
     pos = np.array([x, y])
     top = np.array([x, y_max])
     intersection_count = 0
-    for start, end in zip(ground, ground[1:]):
+    for start, end in zip(ground, ground[1:], strict=False):
         if segment_intersect(start, end, pos, top):
             intersection_count += 1
     return bool(intersection_count % 2)

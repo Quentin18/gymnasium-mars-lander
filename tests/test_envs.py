@@ -110,17 +110,20 @@ def test_collision(env: MarsLanderEnv):
         }
     )
     expected_final_step = 39
+    step = 0
+    reward = 0
 
     # When
-    for i in range(70):
+    for _ in range(70):
         _, reward, terminated, truncated, _ = env.step(
             np.array([-1, 1], dtype=env.action_space.dtype)
         )
         if terminated or truncated:
             break
+        step += 1
 
     # Then
-    assert i == expected_final_step
+    assert step == expected_final_step
     assert reward < 0
 
 
@@ -147,21 +150,25 @@ def test_rover_exits_field_of_view(env: MarsLanderEnv):
         }
     )
     expected_final_step = 54
+    reward = 0
 
     # When
-    for i in range(6):
+    for _ in range(6):
         _, reward, terminated, truncated, _ = env.step(
             np.array([-1, 1], dtype=env.action_space.dtype)
         )
-    for i in range(64):
+
+    step = 0
+    for _ in range(64):
         _, reward, terminated, truncated, _ = env.step(
             np.array([0, 0], dtype=env.action_space.dtype)
         )
         if terminated or truncated:
             break
+        step += 1
 
     # Then
-    assert i == expected_final_step
+    assert step == expected_final_step
     assert reward < 0
 
 
@@ -184,13 +191,15 @@ def test_successful_landing(env: MarsLanderEnv):
         }
     )
     expected_final_step = 64
+    reward = 0
 
     # When
     # Boost speed to max
     for _ in range(4):
         env.step(np.array([0, 1], dtype=env.action_space.dtype))
 
-    for i in range(70):
+    step = 0
+    for _ in range(70):
         _, reward, terminated, truncated, _ = env.step(
             np.array([0, -1], dtype=env.action_space.dtype)
         )
@@ -199,9 +208,10 @@ def test_successful_landing(env: MarsLanderEnv):
         _, reward, terminated, truncated, _ = env.step(
             np.array([0, 1], dtype=env.action_space.dtype)
         )
+        step += 1
 
     # Then
-    assert i == expected_final_step
+    assert step == expected_final_step
     assert reward >= 0
 
 

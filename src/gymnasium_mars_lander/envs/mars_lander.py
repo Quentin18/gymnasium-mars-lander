@@ -152,7 +152,7 @@ class MarsLanderEnv(gym.Env[np.ndarray, np.ndarray]):
         distances = []
 
         segments = [
-            *list(zip(self.ground[:-1], self.ground[1:])),
+            *list(zip(self.ground[:-1], self.ground[1:], strict=False)),
             [(0, 0), (0, self.scene_height)],
             [(0, self.scene_height), (self.scene_width, self.scene_height)],
             [(self.scene_width, self.scene_height), (self.scene_width, 0)],
@@ -224,7 +224,11 @@ class MarsLanderEnv(gym.Env[np.ndarray, np.ndarray]):
         )
 
     def can_see_landing_area(self) -> bool:
-        for segment_start, segment_end in zip(self.ground[:-1], self.ground[1:]):
+        for segment_start, segment_end in zip(
+            self.ground[:-1],
+            self.ground[1:],
+            strict=False,
+        ):
             # Ignore landing area
             if segment_start[1] == segment_end[1]:
                 continue
@@ -519,7 +523,7 @@ class MarsLanderDiscreteEnv(MarsLanderEnv):
                 [-1, 0, 1],
             )
         )
-        self.action_space = spaces.Discrete(len(self.actions))  # type: ignore
+        self.action_space = spaces.Discrete(len(self.actions))
 
     def _convert_action_to_rotate_power(self, action: int) -> tuple[int, int]:  # type: ignore
         return self.actions[action]

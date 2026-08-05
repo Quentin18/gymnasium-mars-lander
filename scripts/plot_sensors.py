@@ -71,7 +71,7 @@ def main() -> None:
     )
 
     segments = [
-        *list(zip(ground[:-1], ground[1:])),
+        *list(zip(ground[:-1], ground[1:], strict=False)),
         [(0, 0), (0, SCENE_HEIGHT)],
         [(0, SCENE_HEIGHT), (SCENE_WIDTH, SCENE_HEIGHT)],
         [(SCENE_WIDTH, SCENE_HEIGHT), (SCENE_WIDTH, 0)],
