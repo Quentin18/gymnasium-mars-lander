@@ -127,6 +127,7 @@ The episode ends if either of the following happens:
 - `start`: starting position between -1 and 4. The default value is `-1`.
 - `eval_env`: if `True`, the random augmentations are disabled. The default value is `False`.
 - `sequential_maps`: if `True`, the maps are generated sequentially. The default value is `False`.
+- `fuel_penalty`: if `True`, the agent is penalized at each step for fuel consumption.
 
 ```python
 import gymnasium as gym
@@ -137,18 +138,51 @@ gym.make(
     start=-1,
     eval_env=False,
     sequential_maps=False,
+    fuel_penalty=False,
 )
 ```
+
+### Version History
+
+- v1: Add boolean indicating whether the rover can see the landing area
+- v0: Initial version
+
+## Discrete environment
+
+The `MarsLanderDiscrete` environment is similar to the `MarsLander` environment except the action space is discrete.
+
+import gymnasium as gym
+
+```python
+import gymnasium as gym
+
+gym.make(
+    "gymnasium_mars_lander:gymnasium_mars_lander/MarsLanderDiscrete-v1",
+    episode=2,
+    start=-1,
+    eval_env=False,
+    sequential_maps=False,
+    fuel_penalty=False,
+)
+```
+
+### Action Space
+
+There are nine discrete actions corresponding to the combinations of angles -15, 0 and +15 degrees and thrust -1, 0 and
++1.
 
 ## Trained agents
 
 There is one trained agent for each episode:
 
-| Path                                                                         | Episode |
-|------------------------------------------------------------------------------|---------|
-| `rl-trained-agents/ppo/gymnasium_mars_lander-MarsLander-v1_1/best_model.zip` | 1       |
-| `rl-trained-agents/ppo/gymnasium_mars_lander-MarsLander-v1_2/best_model.zip` | 2       |
-| `rl-trained-agents/ppo/gymnasium_mars_lander-MarsLander-v1_3/best_model.zip` | 3       |
+| Path                                                                                 | Enrironment             | Episode |
+|--------------------------------------------------------------------------------------|-------------------------|---------|
+| `rl-trained-agents/ppo/gymnasium_mars_lander-MarsLander-v1_1/best_model.zip`         | `MarsLander-v1`         | 1       |
+| `rl-trained-agents/ppo/gymnasium_mars_lander-MarsLander-v1_2/best_model.zip`         | `MarsLander-v1`         | 2       |
+| `rl-trained-agents/ppo/gymnasium_mars_lander-MarsLander-v1_3/best_model.zip`         | `MarsLander-v1`         | 3       |
+| `rl-trained-agents/ppo/gymnasium_mars_lander-MarsLanderDiscrete-v1_1/best_model.zip` | `MarsLanderDiscrete-v1` | 1       |
+| `rl-trained-agents/ppo/gymnasium_mars_lander-MarsLanderDiscrete-v1_2/best_model.zip` | `MarsLanderDiscrete-v1` | 2       |
+| `rl-trained-agents/ppo/gymnasium_mars_lander-MarsLanderDiscrete-v1_3/best_model.zip` | `MarsLanderDiscrete-v1` | 3       |
 
 **Note**: the agents can only solve the episode for which they were trained.
 
@@ -186,7 +220,7 @@ python -m rl_zoo3.train \
 To train an agent for an episode (exemple: 2) with curriculum learning, execute:
 
 ```bash
-./scripts/train.sh 2
+./scripts/train.sh 2 MarsLander-v1
 ```
 
 ### Enjoy a Trained Agent
