@@ -62,11 +62,13 @@ class MarsLanderEnv(gym.Env[np.ndarray, np.ndarray]):
         start: int = -1,
         eval_env: bool = False,
         sequential_maps: bool = False,
+        fuel_penalty: bool = False,
     ) -> None:
         self.episode = episode
         self.start = start
         self.eval_env = eval_env
         self.sequential_maps = sequential_maps
+        self.fuel_penalty = fuel_penalty
         self.test_index = -1
 
         self.gravity = 3.711  # meters/sec^2
@@ -341,7 +343,13 @@ class MarsLanderEnv(gym.Env[np.ndarray, np.ndarray]):
 
         observation = self._get_obs()
         dist = math.dist(self.rover.position(), self.landing_area_center)
-        reward = 0.01 if dist < prev_dist else 0
+        reward = (
+            -0.05 * self.rover.power / self.power_max
+            if self.fuel_penalty
+            else 0.01
+            if dist < prev_dist
+            else 0
+        )
         terminated = False
         info = self._get_info()
 
@@ -508,6 +516,7 @@ class MarsLanderDiscreteEnv(MarsLanderEnv):
         start: int = -1,
         eval_env: bool = False,
         sequential_maps: bool = False,
+        fuel_penalty: bool = False,
     ) -> None:
         super().__init__(
             render_mode=render_mode,
@@ -515,6 +524,7 @@ class MarsLanderDiscreteEnv(MarsLanderEnv):
             start=start,
             eval_env=eval_env,
             sequential_maps=sequential_maps,
+            fuel_penalty=fuel_penalty,
         )
 
         self.actions = list(
