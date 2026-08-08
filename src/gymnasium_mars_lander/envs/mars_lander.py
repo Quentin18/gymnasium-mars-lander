@@ -2,13 +2,13 @@ import dataclasses
 import math
 import os
 from itertools import product
-from typing import Any, cast
+from typing import Any, Generic, cast
 
 import gymnasium as gym
 import numpy as np
 import pygame
 from gymnasium import spaces
-from gymnasium.core import RenderFrame
+from gymnasium.core import ActType, RenderFrame
 
 from gymnasium_mars_lander.envs import geometry
 from gymnasium_mars_lander.envs.level import MARS_LANDER_TEST_CASES
@@ -37,7 +37,7 @@ DIRNAME = os.path.dirname(os.path.abspath(__file__))
 ROVER_IMG_FILENAME = os.path.join(DIRNAME, "assets", "rover.png")
 
 
-class MarsLanderEnv(gym.Env[np.ndarray, np.ndarray]):
+class MarsLanderBaseEnv(Generic[ActType], gym.Env[np.ndarray, ActType]):
     """Environment for the Mars Lander CodinGame optimization game.
 
     Reference: https://www.codingame.com/multiplayer/optimization/mars-lander
@@ -90,13 +90,7 @@ class MarsLanderEnv(gym.Env[np.ndarray, np.ndarray]):
             shape=(len(self.sensor_angles) + 7,),
             dtype=np.float32,
         )
-
-        self.action_space = spaces.Box(
-            low=-1,
-            high=1,
-            shape=(2,),
-            dtype=np.float32,
-        )
+        self._setup_action_space()
 
         render_modes = cast(list[str], self.metadata["render_modes"])
         assert render_mode is None or render_mode in render_modes
@@ -106,6 +100,12 @@ class MarsLanderEnv(gym.Env[np.ndarray, np.ndarray]):
         self.clock = None
         self.font = None
         self.rover_img = None
+
+    def _setup_action_space(self) -> None:
+        raise NotImplementedError
+
+    def _convert_action_to_rotate_power(self, action: ActType) -> tuple[int, int]:
+        raise NotImplementedError
 
     def _generate_random_input(self) -> tuple[np.ndarray, RoverState]:
         test_cases = MARS_LANDER_TEST_CASES[self.episode - 1]
@@ -290,16 +290,6 @@ class MarsLanderEnv(gym.Env[np.ndarray, np.ndarray]):
 
         return observation, info
 
-    def _convert_action_to_rotate_power(self, action: np.ndarray) -> tuple[int, int]:
-        rotate, power = action
-        assert -1 <= rotate <= 1
-        assert -1 <= power <= 1
-
-        rotate = np.rint(rotate * self.rotate_max_step)
-        power = -1 if power < -1 / 3 else 0 if power < 1 / 3 else 1
-
-        return rotate, power
-
     def _update_state(self, rotate: int, power: int) -> None:
         # Update rotation. Value of the previous turn +/- 15°.
         self.rover.rotate += np.rint(rotate)
@@ -329,7 +319,7 @@ class MarsLanderEnv(gym.Env[np.ndarray, np.ndarray]):
 
     def step(
         self,
-        action: np.ndarray,
+        action: ActType,
     ) -> tuple[np.ndarray, float, bool, bool, dict[str, Any]]:
         assert self.action_space.contains(action), (
             f"{action!r} ({type(action)}) invalid"
@@ -508,25 +498,28 @@ class MarsLanderEnv(gym.Env[np.ndarray, np.ndarray]):
             pygame.quit()
 
 
-class MarsLanderDiscreteEnv(MarsLanderEnv):
-    def __init__(
-        self,
-        render_mode: str | None = None,
-        episode: int = 2,
-        start: int = -1,
-        eval_env: bool = False,
-        sequential_maps: bool = False,
-        fuel_penalty: bool = False,
-    ) -> None:
-        super().__init__(
-            render_mode=render_mode,
-            episode=episode,
-            start=start,
-            eval_env=eval_env,
-            sequential_maps=sequential_maps,
-            fuel_penalty=fuel_penalty,
+class MarsLanderEnv(MarsLanderBaseEnv[np.ndarray]):
+    def _setup_action_space(self) -> None:
+        self.action_space = spaces.Box(
+            low=-1,
+            high=1,
+            shape=(2,),
+            dtype=np.float32,
         )
 
+    def _convert_action_to_rotate_power(self, action: np.ndarray) -> tuple[int, int]:
+        rotate, power = action
+        assert -1 <= rotate <= 1
+        assert -1 <= power <= 1
+
+        rotate = np.rint(rotate * self.rotate_max_step)
+        power = -1 if power < -1 / 3 else 0 if power < 1 / 3 else 1
+
+        return rotate, power
+
+
+class MarsLanderDiscreteEnv(MarsLanderBaseEnv[int]):
+    def _setup_action_space(self) -> None:
         self.actions = list(
             product(
                 [-self.rotate_max_step, 0, self.rotate_max_step],
@@ -535,5 +528,5 @@ class MarsLanderDiscreteEnv(MarsLanderEnv):
         )
         self.action_space = spaces.Discrete(len(self.actions))
 
-    def _convert_action_to_rotate_power(self, action: int) -> tuple[int, int]:  # type: ignore
+    def _convert_action_to_rotate_power(self, action: int) -> tuple[int, int]:
         return self.actions[action]
