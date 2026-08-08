@@ -19,6 +19,7 @@ case "$EPISODE" in
       "2 5000000 ${LOG_DIR}/ppo/gymnasium_mars_lander-${ENV_NAME}_2/best_model.zip"
       "3 5000000 ${LOG_DIR}/ppo/gymnasium_mars_lander-${ENV_NAME}_3/best_model.zip"
       "-1 20000000 ${LOG_DIR}/ppo/gymnasium_mars_lander-${ENV_NAME}_4/best_model.zip"
+      "-1 5000000 ${LOG_DIR}/ppo/gymnasium_mars_lander-${ENV_NAME}_5/best_model.zip"  # fuel_penalty:True
     )
     ;;
   3)
@@ -28,7 +29,7 @@ case "$EPISODE" in
       "2 5000000 ${LOG_DIR}/ppo/gymnasium_mars_lander-${ENV_NAME}_2/best_model.zip"
       "3 5000000 ${LOG_DIR}/ppo/gymnasium_mars_lander-${ENV_NAME}_3/best_model.zip"
       "-1 10000000 ${LOG_DIR}/ppo/gymnasium_mars_lander-${ENV_NAME}_4/best_model.zip"
-      "-1 2000000 ${LOG_DIR}/ppo/gymnasium_mars_lander-${ENV_NAME}_5/best_model.zip"
+      "-1 5000000 ${LOG_DIR}/ppo/gymnasium_mars_lander-${ENV_NAME}_5/best_model.zip"
     )
     ;;
 esac
